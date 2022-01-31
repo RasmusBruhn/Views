@@ -1,19 +1,17 @@
-#ifndef VIEWS_STANDARD_FUNCTIONS_INITCLEAN_H_INCLUDED
-#define VIEWS_STANDARD_FUNCTIONS_INITCLEAN_H_INCLUDED
+// Adds initialisation and cleanup functions
+#ifndef VIEWS_CORE_FUNCTIONS_INITCLEAN_H_INCLUDED
+#define VIEWS_CORE_FUNCTIONS_INITCLEAN_H_INCLUDED
 
 #include "Views.h"
-
+// MISSING
 VIW_View *VIW_CreateRoot(SDL_Window *Window, SDL_Renderer *Rend)
 {
-    DBG_SessionStart("VIW_CreateRoot");
-
     // Create the new view
-    VIW_View *Root = (VIW_View *)DBG_Malloc(sizeof(VIW_View));
+    VIW_View *Root = (VIW_View *)malloc(sizeof(VIW_View));
 
     if (Root == NULL)
     {
         _VIW_AddErrorForeign(_VIW_ID_ERRORID_CREATEROOT_MALLOC, strerror(errno), _VIW_STRING_ERROR_MALLOC);
-        DBG_SessionEnd();
         return NULL;
     }
 
@@ -63,7 +61,7 @@ VIW_View *VIW_CreateRoot(SDL_Window *Window, SDL_Renderer *Rend)
     DBG_SessionEnd();
     return Root;
 }
-
+// MISSING
 void VIW_DestroyRoot(VIW_View *Root)
 {
     DBG_SessionStart("VIW_DestroyRoot");
@@ -78,7 +76,7 @@ void VIW_DestroyRoot(VIW_View *Root)
 
     DBG_SessionEnd();
 }
-
+// MISSING
 VIW_View *VIW_CreateViewWithPos(VIW_View *Parent, uint32_t ChildPos)
 {
     DBG_SessionStart("VIW_CreateViewWithPos");
@@ -138,7 +136,7 @@ VIW_View *VIW_CreateViewWithPos(VIW_View *Parent, uint32_t ChildPos)
     DBG_SessionEnd();
     return View;
 }
-
+// MISSING
 void VIW_DestroyView(VIW_View *View)
 {
     DBG_SessionStart("VIW_DestroyView");
@@ -175,7 +173,7 @@ void VIW_DestroyView(VIW_View *View)
 
     DBG_SessionEnd();
 }
-
+// MISSING
 void VIW_Quit(void)
 {
     // Go through all roots and remove them
@@ -184,7 +182,7 @@ void VIW_Quit(void)
     for (VIW_View **EndList = _VIW_RootList.list, **ViewList = EndList + _VIW_RootList.count; ViewList > EndList; --ViewList)
         VIW_DestroyRoot(*(ViewList - 1));
 }
-
+// MISSING
 VIW_View *VIW_CreateSubView(VIW_View *Parent, uint32_t OrderScript, uint32_t OrderEvent, uint32_t OrderGraphics)
 {
     DBG_SessionStart("VIW_CreateSubView");
@@ -223,7 +221,7 @@ VIW_View *VIW_CreateSubView(VIW_View *Parent, uint32_t OrderScript, uint32_t Ord
     DBG_SessionEnd();
     return View;
 }
-
+// MISSING
 VIW_View *VIW_CreateBaseView(VIW_View *Parent, uint32_t OrderScript, uint32_t OrderEvent, uint32_t OrderGraphics)
 {
     DBG_SessionStart("VIW_CreateBaseView");
@@ -259,7 +257,7 @@ VIW_View *VIW_CreateBaseView(VIW_View *Parent, uint32_t OrderScript, uint32_t Or
     DBG_SessionEnd();
     return View;
 }
-
+// MISSING
 VIW_View *VIW_CreateScriptView(VIW_View *Parent, uint64_t Time, uint64_t Increase, uint32_t Order)
 {
     DBG_SessionStart("VIW_CreateScriptView");
@@ -318,7 +316,7 @@ VIW_View *VIW_CreateScriptView(VIW_View *Parent, uint64_t Time, uint64_t Increas
     DBG_SessionEnd();
     return View;
 }
-
+// MISSING
 bool VIW_UseAdvancedShapeData(VIW_View *View)
 {
     DBG_SessionStart("VIW_UseAdvancedShapeData");
@@ -349,7 +347,7 @@ bool VIW_UseAdvancedShapeData(VIW_View *View)
     DBG_SessionEnd();
     return true;
 }
-
+// MISSING
 bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, VIW_View *ID)
 {
     DBG_SessionStart("VIW_AddRef");
@@ -422,7 +420,7 @@ bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, V
     DBG_SessionEnd();
     return true;
 }
-
+// MISSING
 bool VIW_CreatePropertyBase(VIW_View *View)
 {
     // Find next base
@@ -487,7 +485,7 @@ bool VIW_CreatePropertyBase(VIW_View *View)
 
     return true;
 }
-
+// MISSING
 bool VIW_CreatePropertyScript(VIW_View *View)
 {
     // Find next base
@@ -528,7 +526,7 @@ bool VIW_CreatePropertyScript(VIW_View *View)
 
     return true;
 }
-
+// MISSING
 void _VIW_DestroyPropertyBase(VIW_View *View)
 { 
     // Get property
@@ -547,7 +545,7 @@ void _VIW_DestroyPropertyBase(VIW_View *View)
     // Free own script
     DBG_Free(View->property._ownScript);
 }
-
+// MISSING
 void _VIW_DestroyPropertyScript(VIW_View *View)
 {
     bool Return = true;
@@ -563,7 +561,7 @@ void _VIW_DestroyPropertyScript(VIW_View *View)
 
     return Return;
 }
-
+// MISSING
 void *_VIW_AddToListWithPos(void **List, uint32_t Length, void *Object, uint32_t Pos)
 {
     // Make sure Pos is within the list
@@ -591,7 +589,7 @@ void *_VIW_AddToListWithPos(void **List, uint32_t Length, void *Object, uint32_t
 
     return NewList;
 }
-
+// MISSING
 void *_VIW_RemoveFromList(void **List, uint32_t Length, void *Object)
 {
     // Find object in the list
@@ -623,7 +621,7 @@ void *_VIW_RemoveFromList(void **List, uint32_t Length, void *Object)
 
     return NewList;
 }
-
+// MISSING
 bool _VIW_AddToViewListWithPos(VIW_ViewList *List, VIW_View *View, uint32_t Pos)
 {
     // Add view to list
@@ -643,7 +641,7 @@ bool _VIW_AddToViewListWithPos(VIW_ViewList *List, VIW_View *View, uint32_t Pos)
 
     return true;
 }
-
+// MISSING
 void _VIW_RemoveFromViewList(VIW_ViewList *List, VIW_View *View)
 {
     extern uint32_t VIW_ErrorType;
@@ -670,7 +668,7 @@ void _VIW_RemoveFromViewList(VIW_ViewList *List, VIW_View *View)
 
     return true;
 }
-
+// MISSING
 void _VIW_CleanViewList(VIW_ViewList *List)
 {
     // If there is a list, free it
@@ -680,7 +678,7 @@ void _VIW_CleanViewList(VIW_ViewList *List)
     // Initialize
     _VIW_InitStructViewList(List);
 }
-
+// MISSING
 bool _VIW_AddToScriptList(VIW_ScriptList *List, VIW_Script *Script)
 {
     extern uint32_t VIW_ErrorType;
@@ -714,7 +712,7 @@ bool _VIW_AddToScriptList(VIW_ScriptList *List, VIW_Script *Script)
 
     return true;
 }
-
+// MISSING
 void _VIW_RemoveFromScriptList(VIW_ScriptList *List, VIW_Script *Script)
 {
     extern uint32_t VIW_ErrorType;
@@ -741,7 +739,7 @@ void _VIW_RemoveFromScriptList(VIW_ScriptList *List, VIW_Script *Script)
 
     return true;
 }
-
+// MISSING
 void _VIW_CleanScriptList(VIW_ScriptList *List)
 {
     // If there is a list, free it
@@ -752,195 +750,4 @@ void _VIW_CleanScriptList(VIW_ScriptList *List)
     _VIW_InitStructScriptList(List);
 }
 
-void _VIW_InitStructViewList(VIW_ViewList *Struct)
-{
-    Struct->count = 0;
-    Struct->list = NULL;
-}
-
-void _VIW_InitStructView(VIW_View *Struct)
-{
-    _VIW_InitStructParent(&Struct->_parent);
-    _VIW_InitStructChild(&Struct->_child);
-    _VIW_InitStructProperty(&Struct->property);
-    _VIW_InitStructFlagsSet(&Struct->_flags);
-    _VIW_InitStructFlags(&Struct->flags);
-    _VIW_InitStructWindow(&Struct->_window);
-    _VIW_InitStructShape(&Struct->_shape);
-    _VIW_InitStructBounds(&Struct->_bounds);
-    _VIW_InitStructShapeData(&Struct->shapeData);
-}
-
-void _VIW_InitStructParent(VIW_Parent *Struct)
-{
-    Struct->childPos = 0;
-    Struct->parent = NULL;
-    Struct->root = NULL;
-}
-
-void _VIW_InitStructChild(VIW_Child *Struct)
-{
-    _VIW_InitStructViewList(&Struct->list);
-}
-
-void _VIW_InitStructProperty(VIW_Property *Struct)
-{
-    Struct->data = NULL;
-    Struct->_destroyFunc = NULL;
-    Struct->_updateFunc = NULL;
-    Struct->_runEventFunc = NULL;
-    Struct->_runScriptFunc = NULL;
-    Struct->_drawGraphicsFunc = NULL;
-    Struct->_type = VIW_ID_PROPERTY_NONE;
-    Struct->_nextBase = NULL;
-    Struct->_orderEvent = 0;
-    Struct->_orderScript = 0;
-    Struct->_orderGraphics = 0;
-    Struct->_ownScript = NULL;
-    Struct->_ownEventID = NULL;
-}
-
-void _VIW_InitStructFlagsSet(VIW_FlagsSet *Struct)
-{
-    Struct->active = true;
-    Struct->totalActive = true;
-    Struct->updateNextSibling = false;
-    Struct->updateAllSiblings = false;
-}
-
-void _VIW_InitStructFlags(VIW_Flags *Struct)
-{
-    Struct->freezeShape = false;
-    Struct->active = true;
-}
-
-void _VIW_InitStructWindow(VIW_Window *Struct)
-{
-    Struct->rend = NULL;
-    Struct->window = NULL;
-    Struct->ID = 0;
-}
-
-void _VIW_InitStructShape(VIW_Shape *Struct)
-{
-    OBJ_SetRect(Struct->boundRect, 0, 0, 0, 0);
-    OBJ_SetRect(Struct->rect, 0, 0, 0, 0);
-}
-
-void _VIW_InitStructBounds(VIW_Bounds *Struct)
-{
-    OBJ_SetRect(Struct->rect, 0, 0, 0, 0);
-}
-
-void _VIW_InitStructShapeData(VIW_ShapeData *Struct)
-{
-    Struct->type = VIW_ID_SHAPE_COPY;
-    Struct->ref._view = VIW_ID_RELATION_PARENT;
-    Struct->ref._ref = NULL;
-    Struct->data = NULL;
-}
-
-void _VIW_InitStructRect(VIW_Rect *Struct)
-{
-    _VIW_InitStructRectPart(&Struct->x);
-    _VIW_InitStructRectPart(&Struct->y);
-}
-
-void _VIW_InitStructRectPart(VIW_RectPart *Struct)
-{
-    Struct->type = VIW_ID_RECT_NONE;
-}
-
-void _VIW_InitStructRectOrigin(VIW_RectOrigin *Struct)
-{
-    Struct->origin = VIW_ID_ANCHOR_CENTER;
-    _VIW_InitStructPos(&Struct->pos);
-    _VIW_InitStructSize(&Struct->size);
-}
-
-void _VIW_InitStructRectStretch(VIW_RectStretch *Struct)
-{
-    _VIW_InitStructPos(&Struct->pos1);
-    _VIW_InitStructPos(&Struct->pos2);
-}
-
-void _VIW_InitStructSize(VIW_Size *Struct)
-{
-    Struct->type = VIW_ID_SIZE_NONE;
-}
-
-void _VIW_InitStructSizeCopy(VIW_SizeCopy *Struct)
-{
-    _VIW_InitStructReference(&Struct->ref);
-    Struct->scale = 1.;
-    Struct->type = VIW_ID_RELATION_NONE;
-}
-
-void _VIW_InitStructSizeDiff(VIW_SizeDiff *Struct)
-{
-    _VIW_InitStructPos(&Struct->pos1);
-    _VIW_InitStructPos(&Struct->pos2);
-    Struct->scale = 1.;
-}
-
-void _VIW_InitStructPos(VIW_Pos *Struct)
-{
-    Struct->type = VIW_ID_POS_NONE;
-}
-
-void _VIW_InitStructBiasAnchor(VIW_BiasAnchor *Struct)
-{
-    _VIW_InitStructAnchor(&Struct->anchor1);
-    _VIW_InitStructAnchor(&Struct->anchor2);
-    Struct->bias = 0.5;
-}
-
-void _VIW_InitStructAnchor(VIW_Anchor *Struct)
-{
-    Struct->anchorPoint = VIW_ID_ANCHOR_CENTER;
-    Struct->offset = 0;
-    _VIW_InitStructReference(&Struct->ref);
-}
-
-void _VIW_InitStructReference(VIW_Reference *Struct)
-{
-    Struct->_ref = NULL;
-    Struct->_view = VIW_ID_RELATION_NONE;
-}
-
-void _VIW_InitStructEvent(VIW_Event *Struct)
-{
-    Struct->ID = 0;
-    _VIW_InitStructViewList(&Struct->list);
-}
-
-void _VIW_InitStructEventList(VIW_EventList *Struct)
-{
-    Struct->count = 0;
-    Struct->list = NULL;
-}
-
-void _VIW_InitStructScript(VIW_Script *Struct)
-{
-    Struct->view = NULL;
-    Struct->time = -1;
-    Struct->increase = 0;
-}
-
-void _VIW_InitStructScriptList(VIW_ScriptList *Struct)
-{
-    Struct->list = NULL;
-    Struct->count = NULL;
-}
-
-void _VIW_InitStructPropertyBase(VIW_PropertyBase *Struct)
-{
-    _VIW_InitStructScriptList(&Struct->_script);
-    _VIW_InitStructViewList(&Struct->_graphics);
-    _VIW_InitStructEventList(&Struct->_event);
-    Struct->_texture = NULL;
-    Struct->useTexture = false;
-    Struct->_firstSubView = 0;
-}
-
-#endif
+#endif // VIEWS_CORE_FUNCTIONS_INITCLEAN_H_INCLUDED

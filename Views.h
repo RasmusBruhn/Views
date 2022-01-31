@@ -1,7 +1,12 @@
 #ifndef VIEWS_H_INCLUDED
 #define VIEWS_H_INCLUDED
 
-#include <stdinc.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <errno.h>
 #include <SDL2/SDL.h>
 
 #include "_views_core_definitions_error.h"
@@ -13,5 +18,6 @@
 #include "_views_core_functions_shape.h"
 #include "_views_core_functions_initclean.h"
 #include "_views_core_functions_run.h"
+#include "_views_core_functions_structs_init.h"
 
 #endif // VIEWS_H_INCLUDED
