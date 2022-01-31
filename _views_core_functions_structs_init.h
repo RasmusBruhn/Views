@@ -34,9 +34,10 @@ void _VIW_InitStructChild(VIW_Child *Struct)
 {
     _VIW_InitStructViewList(&Struct->list);
 }
-// QUESTIONABLE
+
 void _VIW_InitStructProperty(VIW_Property *Struct)
 {
+    /*
     Struct->data = NULL;
     Struct->_destroyFunc = NULL;
     Struct->_updateFunc = NULL;
@@ -50,14 +51,16 @@ void _VIW_InitStructProperty(VIW_Property *Struct)
     Struct->_orderGraphics = 0;
     Struct->_ownScript = NULL;
     Struct->_ownEventID = NULL;
+    */
 
-    // Struct->data = NULL;
-    // Struct->order = 0;
-    // Struct->_type = _VIW_ID_PROPERTY_NONE;
-    // Struct->_updateFunc = NULL;
-    // Struct->_destroyFunc = NULL;
-    // Struct->_runFunc = NULL;
-    // Struct->_runType = _VIW_ID_PROPERTYTYPE_NONE;
+    Struct->data = NULL;
+    Struct->order = 0;
+    Struct->_type = _VIW_ID_PROPERTY_NONE;
+    Struct->_updateFunc = NULL;
+    Struct->_destroyFunc = NULL;
+    Struct->_runFunc = NULL;
+    Struct->_runType = _VIW_ID_PROPERTYTYPE_NONE;
+    Struct->_nextBase = NULL;
 }
 
 void _VIW_InitStructFlagsSet(VIW_FlagsSet *Struct)
@@ -158,41 +161,36 @@ void _VIW_InitStructReference(VIW_Reference *Struct)
     Struct->view = VIW_ID_RELATION_NONE;
 }
 
-// Again all questionable
-// MISSING
+/*
 void _VIW_InitStructEvent(VIW_Event *Struct)
 {
     Struct->ID = 0;
     _VIW_InitStructViewList(&Struct->list);
 }
-// MISSING
+
 void _VIW_InitStructEventList(VIW_EventList *Struct)
 {
     Struct->count = 0;
     Struct->list = NULL;
 }
-// MISSING
+
 void _VIW_InitStructScript(VIW_Script *Struct)
 {
     Struct->view = NULL;
     Struct->time = -1;
     Struct->increase = 0;
 }
-// MISSING
+
 void _VIW_InitStructScriptList(VIW_ScriptList *Struct)
 {
     Struct->list = NULL;
     Struct->count = NULL;
 }
-// MISSING
+*/
+
 void _VIW_InitStructPropertyBase(VIW_PropertyBase *Struct)
 {
-    _VIW_InitStructScriptList(&Struct->_script);
-    _VIW_InitStructViewList(&Struct->_graphics);
-    _VIW_InitStructEventList(&Struct->_event);
-    Struct->_texture = NULL;
-    Struct->useTexture = false;
-    Struct->_firstSubView = 0;
+    _VIW_InitStructViewList(&Struct->_list);
 }
 
 #endif // VIEWS_CORE_FUNCTIONS_STRUCTS_INIT_H_INCLUDED

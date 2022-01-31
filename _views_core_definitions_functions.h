@@ -78,14 +78,14 @@ bool VIW_CreatePropertyBase(VIW_View *View);
 // Creates the script property for a view
 // Returns true on success and false on error
 // View: The view for which to add the peroperty
-bool VIW_CreatePropertyScript(VIW_View *View);
+//bool VIW_CreatePropertyScript(VIW_View *View);
 
 // Run
 
 // Run a script (functions) from view (if it has a script property), distribute script activation (if it has a base property)
 // Returns true on success and false on error
 // View: The view to run script from
-bool VIW_RunScript(VIW_View *View, uint64_t Time);
+//bool VIW_RunScript(VIW_View *View, uint64_t Time);
 
 // Run an event from the view (if it has an event property), distribute event activation (if it has a base property)
 // Returns true on success and false on error
@@ -93,42 +93,37 @@ bool VIW_RunScript(VIW_View *View, uint64_t Time);
 // EventID: The ID of the event
 // MouseX: The x position of the mouse relative to parent view
 // MouseY: The y position of the mouse relative to parent view
-bool VIW_RunEvent(VIW_View *View, uint32_t EventID, int32_t MouseX, int32_t MouseY);
+//bool VIW_RunEvent(VIW_View *View, uint32_t EventID, int32_t MouseX, int32_t MouseY);
 
 // Draw the graphics from this view (if it has a graphics property), distribute graphics activation (if it has a base property)
 // Returns true on success and false on error
 // View: The view to draw
 // Rend: The renderer to draw to
-bool VIW_DrawGraphics(VIW_View *View, SDL_Renderer *Rend);
+//bool VIW_DrawGraphics(VIW_View *View, SDL_Renderer *Rend);
 
 // Updates the event order
 // Returns true on success and false on error
 // View: The view to update the order for
 // Order: The new event order value for the view
-bool VIW_UpdateEventOrder(VIW_View *View, uint32_t Order);
+//bool VIW_UpdateEventOrder(VIW_View *View, uint32_t Order);
 
 // Updates the sript order
 // Returns true on success and false on error
 // View: The view to update the order for
 // Order: The new script order value for the view
-bool VIW_UpdateScriptOrder(VIW_View *View, uint32_t Order);
+//bool VIW_UpdateScriptOrder(VIW_View *View, uint32_t Order);
 
 // Updates the graphics draw order
 // Returns true on success and false on error
 // View: The view to update the order for
 // Order: The new graphics draw order value for the view
-bool VIW_UpdateGraphicsOrder(VIW_View *View, uint32_t Order);
+//bool VIW_UpdateGraphicsOrder(VIW_View *View, uint32_t Order);
 
 // Updates the time before next sript activation for a view
 // Returns true on success and false on error
 // View: The view to update time for
 // Time: The new time
-bool VIW_UpdateScriptTime(VIW_View *View, uint64_t Time);
-
-// Finds the next base view
-// Returns the base view on success and NULL on error
-// View: The view for which to find the next ancestor which is a base
-VIW_View *VIW_FindNextBase(VIW_View *View);
+//bool VIW_UpdateScriptTime(VIW_View *View, uint64_t Time);
 
 // Internal functions
 
@@ -289,7 +284,7 @@ bool _VIW_AddToViewListWithPos(VIW_ViewList *List, VIW_View *View, uint32_t Pos)
 // Returns true on success and false on error
 // List: The list to remove a view from
 // View: The view to remove from the list
-void _VIW_RemoveFromViewList(VIW_ViewList *List, VIW_View *View);
+bool _VIW_RemoveFromViewList(VIW_ViewList *List, VIW_View *View);
 
 // Cleans up a list, removes all views and initializes all
 // Returns nothing
@@ -329,6 +324,13 @@ void _VIW_RemoveFromScriptList(VIW_ScriptList *List, VIW_Script *Script);
 // Returns nothing
 // List: The list to clean
 void _VIW_CleanScriptList(VIW_ScriptList *List);
+
+// Finds the next base view
+// Returns the base view on success and NULL on error
+// View: The view for which to find the next ancestor which is a base
+VIW_View *_VIW_FindNextBase(VIW_View *View);
+
+// Initialise structs
 
 // Initializes the structure
 // Returns nothing
@@ -409,11 +411,6 @@ void _VIW_InitStructRectStretch(VIW_RectStretch *Struct);
 // Returns nothing
 // Struct: The structure to initialize
 void _VIW_InitStructSize(VIW_Size *Struct);
-
-// Initializes the structure
-// Returns nothing
-// Struct: The structure to initialize
-void _VIW_InitStructSizeCopy(VIW_SizeCopy *Struct);
 
 // Initializes the structure
 // Returns nothing

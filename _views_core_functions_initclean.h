@@ -3,7 +3,7 @@
 #define VIEWS_CORE_FUNCTIONS_INITCLEAN_H_INCLUDED
 
 #include "Views.h"
-// MISSING
+
 VIW_View *VIW_CreateRoot(SDL_Window *Window, SDL_Renderer *Rend)
 {
     // Create the new view
@@ -29,23 +29,13 @@ VIW_View *VIW_CreateRoot(SDL_Window *Window, SDL_Renderer *Rend)
     // Make sure there were no error
     if (Root->_window.ID == 0)
     {
-        DBG_Free(Root);
+        free(Root);
         _VIW_AddErrorForeign(_VIW_ID_ERRORID_CREATEROOT_WINDOWID, SDL_GetError(), _VIW_ID_STRING_WINDOWID);
-        DBG_SessionEnd();
         return NULL;
     }
     
     // Set shape data
     Root->shapeData.type = VIW_ID_SHAPE_WINDOW;
-
-    // Add Base property
-    if (!VIW_CreatePropertyBase(Root))
-    {
-        DBG_Free(Root);
-        _VIW_AddError(_VIW_ID_ERRORID_CREATEROOT_PROPERTY, _VIW_STRING_ERROR_ADDBASEPROPERTY);
-        DBG_SessionEnd();
-        return NULL;
-    }
 
     // Add to list of roots
     extern VIW_ViewList _VIW_RootList;
@@ -54,11 +44,18 @@ VIW_View *VIW_CreateRoot(SDL_Window *Window, SDL_Renderer *Rend)
     {
         DBG_Free(Root);
         _VIW_AddError(_VIW_ID_ERRORID_CREATEROOT_LIST, _VIW_STRING_ERROR_ADDROOTLIST);
-        DBG_SessionEnd();
         return NULL;
     }
 
-    DBG_SessionEnd();
+    // Add Base property
+    if (!VIW_CreatePropertyBase(Root))
+    {
+        _VIW_RemoveFromViewList(&_VIW_RootList, Root);
+        free(Root);
+        _VIW_AddError(_VIW_ID_ERRORID_CREATEROOT_PROPERTY, _VIW_STRING_ERROR_ADDBASEPROPERTY);
+        return NULL;
+    }
+
     return Root;
 }
 // MISSING
@@ -136,42 +133,39 @@ VIW_View *VIW_CreateViewWithPos(VIW_View *Parent, uint32_t ChildPos)
     DBG_SessionEnd();
     return View;
 }
-// MISSING
+
 void VIW_DestroyView(VIW_View *View)
 {
-    DBG_SessionStart("VIW_DestroyView");
-
     // Destroy the property
     if (View->property._destroyFunc != NULL)
         View->property._destroyFunc(View);
 
     // Destroy the shape data
-    if (View->shapeData.data != NULL)
-        DBG_Free(View->shapeData.data);
+    if (View->shapeData.type == VIW_ID_SHAPE_ADVANCED && View->shapeData.data.data != NULL)
+        free(View->shapeData.data.data);
 
     // Destroy the children
     for (VIW_View **EndList = View->_child.list.list, **ViewList = EndList + View->_child.list.count; ViewList > EndList;)
         VIW_DestroyView(*(--ViewList));
 
+    if (View->_child.list.list != NULL)
+        free(View->_child.list.list);
+
     // Remove it from the child list
     if (View->_parent.parent != NULL)
     {
-        // Update base property if needed
-        if (View->_parent.parent->property._type == VIW_ID_PROPERTY_BASE && ((VIW_PropertyBase *)View->_parent.parent->property.data)->_firstSubView > View->_parent.childPos)
-            --((VIW_PropertyBase *)View->_parent.parent->property.data)->_firstSubView;
-
         // Remove it from list
-        _VIW_RemoveFromViewList(&View->_parent.parent->_child.list, View);
+        if (!_VIW_RemoveFromViewList(&View->_parent.parent->_child.list, View))
+            _VIW_AddError(_VIW_ID_ERRORID_DESTROYVIEW_REMOVEFROMLIST, _VIW_STRING_ERROR_REMOVEFROMLIST);
 
         // Update the siblings childPos
-        for (VIW_View **EndList = View->_parent.parent->_child.list.list + View->_parent.parent->_child.list.count, **ViewList = View->_parent.parent->_child.list.list + View->_parent.childPos; ViewList < EndList; ++ViewList)
-            --(*ViewList)->_parent.childPos;
+        else
+            for (VIW_View **EndList = View->_parent.parent->_child.list.list + View->_parent.parent->_child.list.count, **ViewList = View->_parent.parent->_child.list.list + View->_parent.childPos; ViewList < EndList; ++ViewList)
+                --(*ViewList)->_parent.childPos;
     }
 
     // Free the view
     DBG_Free(View);
-
-    DBG_SessionEnd();
 }
 // MISSING
 void VIW_Quit(void)
@@ -250,65 +244,6 @@ VIW_View *VIW_CreateBaseView(VIW_View *Parent, uint32_t OrderScript, uint32_t Or
     {
         VIW_DestroyView(View);
         _VIW_AddError(_VIW_ID_ERRORID_CREATEBASEVIEW_ORDERSCRIPT, _VIW_STRING_ERROR_UPDATESCRIPTORDER);
-        DBG_SessionEnd();
-        return NULL;
-    }
-
-    DBG_SessionEnd();
-    return View;
-}
-// MISSING
-VIW_View *VIW_CreateScriptView(VIW_View *Parent, uint64_t Time, uint64_t Increase, uint32_t Order)
-{
-    DBG_SessionStart("VIW_CreateScriptView");
-
-    // Find the base
-    VIW_View *NextBase = _VIW_FindBase(Parent);
-
-    if (NextBase == NULL)
-    {
-        _VIW_AddError(_VIW_ID_ERRORID_CREATESCRIPTVIEW_NEXTBASE, _VIW_STRING_ERROR_NOBASE);
-        DBG_SessionEnd();
-        return NULL;
-    }
-
-    // Create view
-    VIW_View *View = VIW_CreateViewWithPos(NextBase, ((VIW_PropertyBase *)NextBase->property.data)->_firstSubView);
-
-    if (View == NULL)
-    {
-        _VIW_AddError(_VIW_ID_ERRORID_CREATESCRIPTVIEW_CREATEVIEW, _VIW_STRING_ERROR_CREATEVIEW);
-        DBG_SessionEnd();
-        return NULL;
-    }
-
-    // Create property
-    if (!VIW_CreatePropertyScript(View))
-    {
-        VIW_DestroyView(View);
-        _VIW_AddError(_VIW_ID_ERRORID_CREATESCRIPTVIEW_PROPERTY, _VIW_STRING_ERROR_ADDSCRIPTPROPERTY);
-        DBG_SessionEnd();
-        return NULL;
-    }
-
-    ++((VIW_PropertyBase *)NextBase->property.data)->_firstSubView;
-
-    // Set property data
-    if (!VIW_UpdateScriptTime(View, Time))
-    {
-        VIW_DestroyView(View);
-        _VIW_AddError(_VIW_ID_ERRORID_CREATESCRIPTVIEW_TIME, _VIW_STRING_ERROR_UPDATETIME);
-        DBG_SessionEnd();
-        return NULL;
-    }
-
-    View->property._ownScript->increase = Increase;
-
-    // Update the order
-    if (!VIW_UpdateScriptOrder(View, Order))
-    {
-        VIW_DestroyView(View);
-        _VIW_AddError(_VIW_ID_ERRORID_CREATESCRIPTVIEW_ORDER, _VIW_STRING_ERROR_UPDATESCRIPTORDER);
         DBG_SessionEnd();
         return NULL;
     }
@@ -420,25 +355,11 @@ bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, V
     DBG_SessionEnd();
     return true;
 }
-// MISSING
+
 bool VIW_CreatePropertyBase(VIW_View *View)
 {
-    // Find next base
-    VIW_View *NextBase = NULL;
-
-    if (View->_parent.root != View)
-    {
-        NextBase = _VIW_FindNextBase(View);
-
-        if (NextBase == NULL)
-        {
-            _VIW_AddError(_VIW_ID_ERRORID_CREATEPROPERTYBASE_NEXTBASE, _VIW_STRING_ERROR_NEXTBASE);
-            return false;
-        }
-    }
-
     // Get memory for property
-    VIW_PropertyBase *Property = (VIW_PropertyBase *)DBG_Malloc(sizeof(VIW_PropertyBase));
+    VIW_PropertyBase *Property = (VIW_PropertyBase *)malloc(sizeof(VIW_PropertyBase));
 
     if (Property == NULL)
     {
@@ -449,43 +370,262 @@ bool VIW_CreatePropertyBase(VIW_View *View)
     // Initialize
     _VIW_InitStructPropertyBase(Property);
 
-    // Set own script
-    VIW_Script *OwnScript = (VIW_Script *)DBG_Malloc(sizeof(VIW_Script));
+    extern VIW_View *(**_VIW_BaseFuncList)(VIW_View * BaseView);
+    extern size_t _VIW_BaseFuncCount;
+    
+    Property->_list.count = _VIW_BaseFuncCount;
+    Property->_list.list = (VIW_View **)malloc(sizeof(VIW_View *) * _VIW_BaseFuncCount);
 
-    if (OwnScript == NULL)
+    if (Property->_list.list == NULL)
     {
-        DBG_Free(Property);
-        _VIW_AddErrorForeign(_VIW_ID_ERRORID_CREATEPROPERTYBASE_MALLOCSCRIPT, strerror(errno), _VIW_STRING_ERROR_MALLOC);
+        free(Property);
+        _VIW_AddErrorForeign(_VIW_ID_ERRORID_CREATEPROPERTYBASE_MALLOCLIST, strerror(errno), _VIW_STRING_ERROR_MALLOC);
         return false;
     }
 
-    // Initialize
-    _VIW_InitStructScript(OwnScript);
-    OwnScript->view = View;
-
-    // Link to next base
-    if (!_VIW_AddToScriptList(&((VIW_PropertyBase *)NextBase->property.data)->_script, OwnScript))
-    {
-        DBG_Free(OwnScript);
-        DBG_Free(Property);
-        _VIW_AddError(_VIW_ID_ERRORID_CREATEPROPERTYBASE_LINKSCRIPT, _VIW_STRING_ERROR_ADDTOSCRIPTLIST);
-        return false;
-    }
+    for (VIW_View **List = Property->_list.list, **EndList = Property->_list.list + _VIW_BaseFuncCount; List < EndList; ++List)
+        *List = NULL;
 
     // Set functions and property
     View->property.data = Property;
-    View->property._type = VIW_ID_PROPERTY_BASE;
-    View->property._ownScript = OwnScript;
-    View->property._nextBase = NextBase;
+    View->property._type = _VIW_ID_PROPERTY_BASE;
     View->property._destroyFunc = &_VIW_DestroyPropertyBase;
-    View->property._updateFunc = &_VIW_UpdatePropertyBase;
-    View->property._runEventFunc = &VIW_RunEvent;
-    View->property._runScriptFunc = &VIW_RunScript;
-    View->property._drawGraphicsFunc = &VIW_DrawGraphics;
+    View->property._updateFunc = NULL;
+    View->property._runFunc = NULL;
+
+    // Add to the list
+    for (size_t Count = 0; Count < _VIW_BaseFuncCount; ++Count)
+    {
+        // Create the new view
+        VIW_View *NewView = _VIW_BaseFuncList[Count](View);
+
+        // Make sure everything is ok
+        if (NewView == NULL)
+        {
+            for (VIW_View **ViewList = Property->_list.list + Count - 1, **ViewListEnd = Property->_list.list; ViewList >= ViewListEnd; --ViewList)
+                VIW_DestroyView(*ViewList);
+
+            free(Property->_list.list);
+            free(Property);
+            _VIW_AddErrorForeign(_VIW_ID_ERRORID_CREATEPROPERTYBASE_MALLOCNEW, strerror(errno), _VIW_STRING_ERROR_MALLOCCOUNT, Count);
+            return false;
+        }
+
+        // Add to the list
+        Property->_list.list[Count] = NewView;
+    }
+        
+    return true;
+}
+
+void _VIW_DestroyPropertyBase(VIW_View *View)
+{ 
+    // Free the list
+    free(((VIW_PropertyBase *)View->property.data)->_list.list);
+
+    // Free the property
+    free(View->property.data);
+}
+
+void *_VIW_AddToListWithPos(void **List, uint32_t Length, void *Object, uint32_t Pos)
+{
+    // Make sure Pos is within the list
+    if (Pos > Length)
+    {
+        _VIW_SetError(_VIW_ID_ERRORID_ADDTOLIST_POS, _VIW_STRING_ERROR_RANGE);
+        return NULL;
+    }
+
+    // make list longer
+    void **NewList = (void **)DBG_Realloc(List, sizeof(void *) * (Length + 1));
+
+    // Error if realloc failed
+    if (NewList == NULL)
+    {
+        _VIW_AddErrorForeign(_VIW_ID_ERRORID_ADDTOLIST_REALLOC, strerror(errno), _VIW_STRING_ERROR_REALLOC);
+        return NULL;
+    }
+
+    // Add object
+    for (void **VarList = NewList + Length, **EndList = NewList + Pos; VarList > EndList; --VarList)
+        *VarList = *(VarList - 1);
+
+    NewList[Pos] = Object;
+
+    return NewList;
+}
+
+void *_VIW_RemoveFromList(void **List, uint32_t Length, void *Object)
+{
+    // Find object in the list
+    void **VarList, **EndList;
+
+    for (VarList = List, EndList = List + Length; VarList < EndList; ++VarList)
+        if (*VarList == Object)
+            break;
+
+    // Make sure it actually found the element
+    if (VarList == EndList)
+    {
+        _VIW_SetError(_VIW_ID_ERRORID_REMOVEFROMLIST_LOCATE, _VIW_STRING_ERROR_LOCATEOBJECT);
+        return NULL;
+    }
+
+    // Remove the element
+    for (++VarList; VarList < EndList; ++VarList)
+        *(VarList - 1) = *VarList;
+
+    // Reallocate list
+    void **NewList = (void **)realloc(List, sizeof(void *) * (Length - 1));
+
+    if (NewList == NULL && Length > 1)
+    {
+        _VIW_AddErrorForeign(_VIW_ID_ERRORID_REMOVEFROMLIST_REALLOC, strerror(errno), _VIW_STRING_ERROR_REALLOC);
+        return NULL;
+    }
+
+    return NewList;
+}
+
+bool _VIW_AddToViewListWithPos(VIW_ViewList *List, VIW_View *View, uint32_t Pos)
+{
+    // Add view to list
+    VIW_View **NewList = (VIW_View **)_VIW_AddToListWithPos(List->list, List->count, View, Pos);
+
+    if (NewList == NULL)
+    {
+        _VIW_AddError(_VIW_ID_ERRORID_ADDTOVIEWLIST_LIST, _VIW_STRING_ERROR_ADDTOLIST);
+        return false;
+    }
+
+    // Set new list
+    List->list = NewList;
+
+    // Update count
+    ++List->count;
+
+    return true;
+}
+
+bool _VIW_RemoveFromViewList(VIW_ViewList *List, VIW_View *View)
+{
+    extern uint32_t VIW_ErrorType;
+
+    // Remove object
+    VIW_View **NewList = (VIW_View **)_VIW_RemoveFromList(List->list, List->count, View);
+
+    if (NewList == NULL && List->count > 1)
+    {
+        if (VIW_ErrorType <= 1)
+            _VIW_AddError(_VIW_ID_ERRORID_REMOVEFROMVIEWLIST_WARNING, _VIW_STRING_ERROR_REMOVEFROMLIST);
+
+        else
+            _VIW_AddError(_VIW_ID_ERRORID_REMOVEFROMVIEWLIST_ERROR, _VIW_STRING_ERROR_REMOVEFROMLIST);
+
+        return false;
+    }
+
+    // Set new list
+    List->list = NewList;
+
+    // Update count
+    --List->count;
 
     return true;
 }
 // MISSING
+void _VIW_CleanViewList(VIW_ViewList *List)
+{
+    // If there is a list, free it
+    if (List->list != NULL)
+        DBG_Free(List->list);
+
+    // Initialize
+    _VIW_InitStructViewList(List);
+}
+
+VIW_View *_VIW_FindNextBase(VIW_View *View)
+{
+    // Check if it is a root
+    if (View->_parent.root == View)
+    {
+        _VIW_SetError(_VIW_ID_ERRORID_FINDNEXTBASE_ROOT, _VIW_STRING_ERROR_ROOTNEXTBASE);
+        return NULL;
+    }
+
+    // Find the next base
+    VIW_View *NextBase;
+
+    for (NextBase = View->_parent.parent; NextBase->property._type != _VIW_ID_PROPERTY_BASE; NextBase = NextBase->_parent.parent)
+        if (NextBase == NextBase->_parent.root)
+        {
+            _VIW_SetError(_VIW_ID_ERRORID_FINDNEXTBASE_NOBASE, _VIW_STRING_ERROR_NEXTBASE);
+            return NULL;
+        }
+
+    return NextBase;
+}
+
+/*
+VIW_View *VIW_CreateScriptView(VIW_View *Parent, uint64_t Time, uint64_t Increase, uint32_t Order)
+{
+    DBG_SessionStart("VIW_CreateScriptView");
+
+    // Find the base
+    VIW_View *NextBase = _VIW_FindBase(Parent);
+
+    if (NextBase == NULL)
+    {
+        _VIW_AddError(_VIW_ID_ERRORID_CREATESCRIPTVIEW_NEXTBASE, _VIW_STRING_ERROR_NOBASE);
+        DBG_SessionEnd();
+        return NULL;
+    }
+
+    // Create view
+    VIW_View *View = VIW_CreateViewWithPos(NextBase, ((VIW_PropertyBase *)NextBase->property.data)->_firstSubView);
+
+    if (View == NULL)
+    {
+        _VIW_AddError(_VIW_ID_ERRORID_CREATESCRIPTVIEW_CREATEVIEW, _VIW_STRING_ERROR_CREATEVIEW);
+        DBG_SessionEnd();
+        return NULL;
+    }
+
+    // Create property
+    if (!VIW_CreatePropertyScript(View))
+    {
+        VIW_DestroyView(View);
+        _VIW_AddError(_VIW_ID_ERRORID_CREATESCRIPTVIEW_PROPERTY, _VIW_STRING_ERROR_ADDSCRIPTPROPERTY);
+        DBG_SessionEnd();
+        return NULL;
+    }
+
+    ++((VIW_PropertyBase *)NextBase->property.data)->_firstSubView;
+
+    // Set property data
+    if (!VIW_UpdateScriptTime(View, Time))
+    {
+        VIW_DestroyView(View);
+        _VIW_AddError(_VIW_ID_ERRORID_CREATESCRIPTVIEW_TIME, _VIW_STRING_ERROR_UPDATETIME);
+        DBG_SessionEnd();
+        return NULL;
+    }
+
+    View->property._ownScript->increase = Increase;
+
+    // Update the order
+    if (!VIW_UpdateScriptOrder(View, Order))
+    {
+        VIW_DestroyView(View);
+        _VIW_AddError(_VIW_ID_ERRORID_CREATESCRIPTVIEW_ORDER, _VIW_STRING_ERROR_UPDATESCRIPTORDER);
+        DBG_SessionEnd();
+        return NULL;
+    }
+
+    DBG_SessionEnd();
+    return View;
+}
+
 bool VIW_CreatePropertyScript(VIW_View *View)
 {
     // Find next base
@@ -526,26 +666,7 @@ bool VIW_CreatePropertyScript(VIW_View *View)
 
     return true;
 }
-// MISSING
-void _VIW_DestroyPropertyBase(VIW_View *View)
-{ 
-    // Get property
-    VIW_PropertyBase *Property = (VIW_PropertyBase *)View->property.data;
-    
-    // Free texture
-    if (Property->_texture != NULL)
-        SDL_DestroyTexture(Property->_texture);
 
-    // Free script list
-    _VIW_CleanScriptList(&Property->_script);
-
-    // Free property
-    DBG_Free(Property);
-
-    // Free own script
-    DBG_Free(View->property._ownScript);
-}
-// MISSING
 void _VIW_DestroyPropertyScript(VIW_View *View)
 {
     bool Return = true;
@@ -561,124 +682,7 @@ void _VIW_DestroyPropertyScript(VIW_View *View)
 
     return Return;
 }
-// MISSING
-void *_VIW_AddToListWithPos(void **List, uint32_t Length, void *Object, uint32_t Pos)
-{
-    // Make sure Pos is within the list
-    if (Pos > Length)
-    {
-        _VIW_SetError(_VIW_ID_ERRORID_ADDTOLIST_POS, _VIW_STRING_ERROR_RANGE);
-        return NULL;
-    }
 
-    // make list longer
-    void **NewList = (void **)DBG_Realloc(List, sizeof(void *) * (Pos + 1));
-
-    // Error if realloc failed
-    if (NewList == NULL)
-    {
-        _VIW_AddErrorForeign(_VIW_ID_ERRORID_ADDTOLIST_REALLOC, strerror(errno), _VIW_STRING_ERROR_REALLOC);
-        return NULL;
-    }
-
-    // Add object
-    for (void **VarList = NewList + Length, **EndList = NewList + Pos; VarList > EndList; --VarList)
-        *VarList = *(VarList - 1);
-
-    NewList[Pos] = Object;
-
-    return NewList;
-}
-// MISSING
-void *_VIW_RemoveFromList(void **List, uint32_t Length, void *Object)
-{
-    // Find object in the list
-    void **VarList, **EndList;
-
-    for (VarList = List + Length - 1, EndList = List; VarList + 1 > EndList; --VarList)
-        if (*VarList == Object)
-            break;
-
-    // Make sure it actually found the element
-    if (VarList + 1 == EndList)
-    {
-        _VIW_SetError(_VIW_ID_ERRORID_REMOVEFROMLIST_LOCATE, _VIW_STRING_ERROR_LOCATEOBJECT);
-        return NULL;
-    }
-
-    // Remove the element
-    for (++VarList, EndList = List + Length; VarList < EndList; ++VarList)
-        *(VarList - 1) = *VarList;
-
-    // Reallocate list
-    void **NewList = (void **)DBG_Realloc(List, sizeof(void *) * (Length - 1));
-
-    if (NewList == NULL && Length > 1)
-    {
-        _VIW_AddErrorForeign(_VIW_ID_ERRORID_REMOVEFROMLIST_REALLOC, strerror(errno), _VIW_STRING_ERROR_REALLOC);
-        return NULL;
-    }
-
-    return NewList;
-}
-// MISSING
-bool _VIW_AddToViewListWithPos(VIW_ViewList *List, VIW_View *View, uint32_t Pos)
-{
-    // Add view to list
-    VIW_View **NewList = (VIW_View **)_VIW_AddToListWithPos(List->list, List->count, View, Pos);
-
-    if (NewList == NULL)
-    {
-        _VIW_AddError(_VIW_ID_ERRORID_ADDTOVIEWLIST_LIST, _VIW_STRING_ERROR_ADDTOLIST);
-        return false;
-    }
-
-    // Set new list
-    List->list = NewList;
-
-    // Update count
-    ++List->count;
-
-    return true;
-}
-// MISSING
-void _VIW_RemoveFromViewList(VIW_ViewList *List, VIW_View *View)
-{
-    extern uint32_t VIW_ErrorType;
-
-    // Remove object
-    VIW_View **NewList = (VIW_View **)_VIW_RemoveFromList(List->list, List->count, View);
-
-    if (NewList == NULL && List->count > 1)
-    {
-        if (VIW_ErrorType <= 1)
-            _VIW_AddError(_VIW_ID_ERRORID_REMOVEFROMVIEWLIST_WARNING, _VIW_STRING_ERROR_REMOVEFROMLIST);
-
-        else
-            _VIW_AddError(_VIW_ID_ERRORID_REMOVEFROMVIEWLIST_ERROR, _VIW_STRING_ERROR_REMOVEFROMLIST);
-
-        return false;
-    }
-
-    // Set new list
-    List->list = NewList;
-
-    // Update count
-    --List->count;
-
-    return true;
-}
-// MISSING
-void _VIW_CleanViewList(VIW_ViewList *List)
-{
-    // If there is a list, free it
-    if (List->list != NULL)
-        DBG_Free(List->list);
-
-    // Initialize
-    _VIW_InitStructViewList(List);
-}
-// MISSING
 bool _VIW_AddToScriptList(VIW_ScriptList *List, VIW_Script *Script)
 {
     extern uint32_t VIW_ErrorType;
@@ -712,7 +716,7 @@ bool _VIW_AddToScriptList(VIW_ScriptList *List, VIW_Script *Script)
 
     return true;
 }
-// MISSING
+
 void _VIW_RemoveFromScriptList(VIW_ScriptList *List, VIW_Script *Script)
 {
     extern uint32_t VIW_ErrorType;
@@ -739,7 +743,7 @@ void _VIW_RemoveFromScriptList(VIW_ScriptList *List, VIW_Script *Script)
 
     return true;
 }
-// MISSING
+
 void _VIW_CleanScriptList(VIW_ScriptList *List)
 {
     // If there is a list, free it
@@ -749,5 +753,6 @@ void _VIW_CleanScriptList(VIW_ScriptList *List)
     // Initialize
     _VIW_InitStructScriptList(List);
 }
+*/
 
 #endif // VIEWS_CORE_FUNCTIONS_INITCLEAN_H_INCLUDED

@@ -2,7 +2,7 @@
 #define VIEWS_STANDARD_FUNCTIONS_BASE_H_INCLUDED
 
 #include "Views.h"
-
+/*
 bool VIW_RunScript(VIW_View *View, uint64_t Time)
 {
     extern uint32_t VIW_ErrorType;
@@ -121,12 +121,7 @@ bool VIW_UpdateScriptTime(VIW_View *View, uint64_t Time)
     return true;
 }
 
-bool _VIW_UpdatePropertyBase(VIW_View *View)
-{
-    // Nothing here yet, need to update texture if shape changes and texture is used
-    return true;
-}
-
+// MISSING
 bool _VIW_UpdateScriptList(VIW_ScriptList *List, VIW_Script *Script)
 {
     // Find the script
@@ -159,33 +154,13 @@ bool _VIW_UpdateScriptList(VIW_ScriptList *List, VIW_Script *Script)
 
     return true;
 }
-
+// MISSING
 bool _VIW_UpdateGraphicsList(VIW_ViewList *List, VIW_View *View)
 {
 }
+*/
 
-VIW_View *VIW_FindNextBase(VIW_View *View)
-{
-    // Check if it is a root
-    if (View->_parent.root == View)
-    {
-        _VIW_SetError(_VIW_ID_ERRORID_FINDNEXTBASE_ROOT, _VIW_STRING_ERROR_ROOTNEXTBASE);
-        return NULL;
-    }
-
-    // Find the next base
-    VIW_View *NextBase;
-
-    for (NextBase = View->_parent.parent; NextBase->property._type != VIW_ID_PROPERTY_BASE; NextBase = NextBase->_parent.parent)
-        if (NextBase == NextBase->_parent.root)
-        {
-            _VIW_SetError(_VIW_ID_ERRORID_FINDNEXTBASE_NOBASE, _VIW_STRING_ERROR_NEXTBASE);
-            return NULL;
-        }
-
-    return NextBase;
-}
-
+/*
 VIW_View *_VIW_FindBase(VIW_View *View)
 {
     // If view is base itself, return view
@@ -200,5 +175,5 @@ VIW_View *_VIW_FindBase(VIW_View *View)
     _VIW_SetError(_VIW_ID_ERRORID_FINDBASE_NOBASE, _VIW_STRING_ERROR_NOBASE);
     return NULL;
 }
-
+*/
 #endif

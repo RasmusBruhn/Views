@@ -195,31 +195,18 @@ struct __VIW_FlagsSet
     bool updateNextSibling : 1; // If true then when this view is updated it will update the next sibling
     bool updateAllSiblings : 1; // If true then when this view is updated it will update all siblings after this
 };
-// QUESTIONABLE
+
 // View properties, the special properties for a view
 struct __VIW_Property
 {
-    uint32_t _type;                                                                          // The type of view property
-    void *data;                                                                              // The property data
-    bool (*_updateFunc)(VIW_View *View);                                                     // The function when the view has updated its shape
-    void (*_destroyFunc)(VIW_View *View);                                                    // The function which destroys the property
-    bool (*_runEventFunc)(VIW_View *View, uint32_t EventID, int32_t MouseX, int32_t MouseY); // The function to run when event is run
-    bool (*_runScriptFunc)(VIW_View *View, uint64_t Time);                                   // The function to run when script is run
-    bool (*_drawGraphicsFunc)(VIW_View *View, SDL_Renderer *Rend);                           // The function to run when graphics need to be drawn
-    uint32_t _orderEvent;                                                                    // The order value for running events, lower order means that it will be run before other views
-    uint32_t _orderScript;                                                                   // The order value for running scripts, lower order means that it will be run before other views
-    uint32_t _orderGraphics;                                                                 // The order value for drawing graphics, lower order means that it will be run before other views
-    VIW_View *_nextBase;                                                                     // The base up next in the hierarchy
-    VIW_Script *_ownScript;                                                                  // Pointer to it's own script data in the next base
-    uint32_t *_ownEventID;                                                                   // Pointer to it's own event data in the next base
-
-    // enum _VIW_ID_Property _type;                 // The type of view property
-    // void *data;                                  // The property data
-    // bool (*_updateFunc)(VIW_View *View);         // The function when the view has updated its shape
-    // void (*_destroyFunc)(VIW_View *View);        // The function which destroys the property
-    // bool (*_runFunc)(VIW_View *View);            // The function to run when the view is activated
-    // uint32_t order;                              // The order in which it should use the run function, lowest order view runs first
-    // enum _VIW_ID_PropertyType _runType;         // The type of run function that it uses (and the type the order is)
+    void *data;                           // The property data
+    uint32_t order;                       // The order in which it should use the run function, lowest order view runs first
+    enum _VIW_ID_Property _type;          // The type of view property
+    bool (*_updateFunc)(VIW_View *View);  // The function when the view has updated its shape
+    void (*_destroyFunc)(VIW_View *View); // The function which destroys the property
+    bool (*_runFunc)(VIW_View *View);     // The function to run when the view is activated
+    enum _VIW_ID_PropertyType _runType;   // The type of run function that it uses (and the type the order is)
+    VIW_View *_nextBase;                  // The base up next in the hierarchy
 };
 
 // Children
@@ -250,46 +237,10 @@ struct __VIW_View
     VIW_Property property;   // The special properties for this view, button, graphics ect.
 };
 
-// This is all questionable, probably needs to be removed and added in some expansion instead
-// MISSING
-// Event types with associated views
-struct __VIW_Event
-{
-    uint32_t ID;       // The ID of the event
-    VIW_ViewList list; // The list of views using this event
-};
-// MISSING
-// List of events
-struct __VIW_EventList
-{
-    VIW_Event **list; // The list of events
-    uint32_t count;   // The number of events in the list
-};
-// MISSING
-// Script views and when to activate them
-struct __VIW_Script
-{
-    VIW_View *view;    // The view which holds the script
-    uint64_t time;     // The time (clock_t, returned by clock_t) that this script should be activated in clock ticks
-    uint64_t increase; // The amount of time to increate the timer with after each activation
-};
-// MISSING
-// List of sripts
-struct __VIW_ScriptList
-{
-    VIW_Script **list; // The list of scripts
-    uint32_t count;    // The number of scripts in the list
-};
-// MISSING
 // Base property structure
 struct __VIW_PropertyBase
 {
-    VIW_ScriptList _script; // The list of scripts
-    VIW_EventList _event;   // The list of events
-    VIW_ViewList _graphics; // The list of graphics
-    SDL_Texture *_texture;  // The texture for drawing
-    bool useTexture : 1;   // True if it should use the texture
-    uint32_t _firstSubView; // The position of the first sub view in the child list, all view behind this is property views
+    VIW_ViewList _list; // The list of controlers for things like events and graphics
 };
 
 #endif // VIEWS_CORE_DEFINITIONS_STRUCTS_H_INCLUDED
