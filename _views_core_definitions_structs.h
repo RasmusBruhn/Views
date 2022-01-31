@@ -22,6 +22,7 @@ typedef struct __VIW_RectOrigin VIW_RectOrigin;
 typedef union ___VIW_RectPart _VIW_RectPart;
 typedef struct __VIW_RectPart VIW_RectPart;
 typedef struct __VIW_Rect VIW_Rect;
+typedef union ___VIW_ShapeData _VIW_ShapeData;
 typedef struct __VIW_ShapeData VIW_ShapeData;
 typedef struct __VIW_Bounds VIW_Bounds;
 typedef struct __VIW_Shape VIW_Shape;
@@ -48,8 +49,8 @@ struct __VIW_ViewList
 // Structure to determine a reference to a view
 struct __VIW_Reference
 {
-    enum VIW_ID_Relation _view; // The view it is anchored to, VIW_ID_Relation
-    VIW_View *_ref;             // If it is anchored to view by id then this is the id
+    enum VIW_ID_Relation view; // The view it is anchored to, VIW_ID_Relation
+    VIW_View *ref;             // If it is anchored to view by id then this is the id
 };
 
 // Anchor, how something is anchored
@@ -89,7 +90,6 @@ struct __VIW_SizeDiff
 {
     VIW_Pos pos1; // The first position
     VIW_Pos pos2; // The second position
-    double scale; // How much to scale the difference
 };
 
 // Size union
@@ -99,7 +99,6 @@ union ___VIW_Size
     int32_t *pointer;   // When a pointer to a value is used
     VIW_SizeDiff diff;  // When a difference between 2 positions is used
     VIW_Reference copy; // When a size is copied from another view
-    double scale;       // How much to scale the size
 };
 
 // Data to calculate a size
@@ -107,6 +106,7 @@ struct __VIW_Size
 {
     enum VIW_ID_Size type; // How the size is determined, VIW_ID_Size
     _VIW_Size data;        // The data to determine the size
+    double scale;          // How much to scale the size
 };
 
 // Definition of rectangle (one coordinate) by setting the position of both sides of the rectangle
@@ -145,12 +145,18 @@ struct __VIW_Rect
     VIW_RectPart y; // The y coordinate
 };
 
+// Union for shape data
+union ___VIW_ShapeData
+{
+    VIW_Reference ref; // Reference used if it should copy the data
+    VIW_Rect *data;    // Data for when it is on advanced mode
+};
+
 // The shape data of a view
 struct __VIW_ShapeData
 {
     enum VIW_ID_Shape type; // The method for getting the shape
-    VIW_Reference ref;      // Reference used if it should copy the data
-    VIW_Rect *data;         // Data for when it is on advanced mode
+    _VIW_ShapeData data;    // The data
 };
 
 // bounds data, contains information on the size and position bounds
@@ -213,7 +219,7 @@ struct __VIW_Property
     // void (*_destroyFunc)(VIW_View *View);        // The function which destroys the property
     // bool (*_runFunc)(VIW_View *View);            // The function to run when the view is activated
     // uint32_t order;                              // The order in which it should use the run function, lowest order view runs first
-    // enum _VIW_ID_PropertyFlags _runType;         // The type of run function that it uses (and the type the order is)
+    // enum _VIW_ID_PropertyType _runType;         // The type of run function that it uses (and the type the order is)
 };
 
 // Children
@@ -243,6 +249,8 @@ struct __VIW_View
     VIW_ShapeData shapeData; // The data to use to determine the shape
     VIW_Property property;   // The special properties for this view, button, graphics ect.
 };
+
+// This is all questionable, probably needs to be removed and added in some expansion instead
 // MISSING
 // Event types with associated views
 struct __VIW_Event
