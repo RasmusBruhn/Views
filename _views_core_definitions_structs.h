@@ -15,7 +15,6 @@ typedef struct __VIW_BiasAnchor VIW_BiasAnchor;
 typedef union ___VIW_Pos _VIW_Pos;
 typedef struct __VIW_Pos VIW_Pos;
 typedef struct __VIW_SizeDiff VIW_SizeDiff;
-typedef struct __VIW_SizeCopy VIW_SizeCopy;
 typedef union ___VIW_Size _VIW_Size;
 typedef struct __VIW_Size VIW_Size;
 typedef struct __VIW_RectStretch VIW_RectStretch;
@@ -45,14 +44,14 @@ struct __VIW_ViewList
     VIW_View **list;
     uint32_t count;
 };
-// MISSING
+
 // Structure to determine a reference to a view
 struct __VIW_Reference
 {
     enum VIW_ID_Relation _view; // The view it is anchored to, VIW_ID_Relation
     VIW_View *_ref;             // If it is anchored to view by id then this is the id
 };
-// MISSING
+
 // Anchor, how something is anchored
 struct __VIW_Anchor
 {
@@ -60,7 +59,7 @@ struct __VIW_Anchor
     enum VIW_ID_Anchor anchorPoint; // The position it is anchored to on that view, VIW_ID_Anchor
     int32_t offset;                 // The offset from the anchor point where it is anchored
 };
-// MISSING
+
 // Biased anchor, an anchor point determined from 2 anchors
 struct __VIW_BiasAnchor
 {
@@ -68,7 +67,7 @@ struct __VIW_BiasAnchor
     VIW_Anchor anchor2; // The second anchor point
     double bias;        // The bias between the anchor points (0 is anchor1 and 1 is anchor2, linear scaling, can be outside this range)
 };
-// MISSING
+
 // Position union
 union ___VIW_Pos
 {
@@ -77,14 +76,14 @@ union ___VIW_Pos
     VIW_Anchor single;   // When a single anchor is used
     VIW_BiasAnchor bias; // When a biased anchor is used
 };
-// MISSING
+
 // Position, includes data to find a position, like x or y
 struct __VIW_Pos
 {
     enum VIW_ID_Pos type; // How the position is to be determined, VIW_ID_Pos
     _VIW_Pos data;        // The data to determine the position
 };
-// MISSING
+
 // Data to find the distance between 2 points
 struct __VIW_SizeDiff
 {
@@ -92,60 +91,53 @@ struct __VIW_SizeDiff
     VIW_Pos pos2; // The second position
     double scale; // How much to scale the difference
 };
-// MISSING
-// Data to copy a size from another view
-struct __VIW_SizeCopy
-{
-    VIW_Reference ref;         // The data to determine the anchor view
-    enum VIW_ID_SizeCopy type; // What size to copy, VIW_ID_SizeCopy
-    double scale;              // How much to scale the size
-};
-// MISSING
+
 // Size union
 union ___VIW_Size
 {
-    int32_t rigid;     // When a set value is used
-    int32_t *pointer;  // When a pointer to a value is used
-    VIW_SizeDiff diff; // When a difference between 2 positions is used
-    VIW_SizeCopy copy; // When a size is copied from another view
+    int32_t rigid;      // When a set value is used
+    int32_t *pointer;   // When a pointer to a value is used
+    VIW_SizeDiff diff;  // When a difference between 2 positions is used
+    VIW_Reference copy; // When a size is copied from another view
+    double scale;       // How much to scale the size
 };
-// MISSING
+
 // Data to calculate a size
 struct __VIW_Size
 {
     enum VIW_ID_Size type; // How the size is determined, VIW_ID_Size
     _VIW_Size data;        // The data to determine the size
 };
-// MISSING
+
 // Definition of rectangle (one coordinate) by setting the position of both sides of the rectangle
 struct __VIW_RectStretch
 {
     VIW_Pos pos1; // The position of the negative side
     VIW_Pos pos2; // The position of the positive side
 };
-// MISSING
+
 // Definition of rectangle (one coordinate) by setting the origin and size
 struct __VIW_RectOrigin
 {
-    enum VIW_ID_Anchor origin; // The origin on the rectangle, VIW_ID_Anchor
+    enum VIW_ID_Anchor origin; // The origin on the rectangle (the point on the rectangle defined as the origin), VIW_ID_Anchor
     VIW_Pos pos;               // The position of the origin
     VIW_Size size;             // The size of the rectangle
 };
-// MISSING
+
 // Union for one coordinate of rectangle
 union ___VIW_RectPart
 {
     VIW_RectStretch stretch; // If stretch is used
     VIW_RectOrigin origin;   // If origin is used
 };
-// MISSING
+
 // Data to calculate one coordinate of a rectangle
 struct __VIW_RectPart
 {
     enum VIW_ID_Rect type; // How the rectangle is determined, VIW_ID_Rect
     _VIW_RectPart data;    // The data to determine the coordinate of the rectangle
 };
-// MISSING
+
 // Definition of rectangle
 struct __VIW_Rect
 {
@@ -215,13 +207,13 @@ struct __VIW_Property
     VIW_Script *_ownScript;                                                                  // Pointer to it's own script data in the next base
     uint32_t *_ownEventID;                                                                   // Pointer to it's own event data in the next base
 
-    // uint32_t _type;                              // The type of view property
+    // enum _VIW_ID_Property _type;                 // The type of view property
     // void *data;                                  // The property data
     // bool (*_updateFunc)(VIW_View *View);         // The function when the view has updated its shape
     // void (*_destroyFunc)(VIW_View *View);        // The function which destroys the property
     // bool (*_runFunc)(VIW_View *View);            // The function to run when the view is activated
     // uint32_t order;                              // The order in which it should use the run function, lowest order view runs first
-    // uint16_t _flags;                             // The general flags for the property of this view, like if it is an event or graphics
+    // enum _VIW_ID_PropertyFlags _runType;         // The type of run function that it uses (and the type the order is)
 };
 
 // Children

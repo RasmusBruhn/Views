@@ -1,7 +1,7 @@
-#ifndef VIEWS_STANDARD_DEFINITIONS_ID_H_INCLUDED
-#define VIEWS_STANDARD_DEFINITIONS_ID_H_INCLUDED
+#ifndef VIEWS_CORE_DEFINITIONS_ID_H_INCLUDED
+#define VIEWS_CORE_DEFINITIONS_ID_H_INCLUDED
 
-// Anchor id
+// Anchor id, what part of a rectangle we are refering to
 enum VIW_ID_Anchor
 {
     VIW_ID_ANCHOR_CENTER,
@@ -13,60 +13,53 @@ enum VIW_ID_Anchor
 enum VIW_ID_Relation
 {
     VIW_ID_RELATION_NONE,
-    VIW_ID_RELATION_ROOT,
-    VIW_ID_RELATION_PARENT,
-    VIW_ID_RELATION_SIBLING,
-    VIW_ID_RELATION_ID
+    VIW_ID_RELATION_ROOT,    // Its root
+    VIW_ID_RELATION_PARENT,  // Its parent
+    VIW_ID_RELATION_SIBLING, // The previous sibling
+    VIW_ID_RELATION_ID       // By ID (This can be any of its earlier siblings, ancestors or ancestor siblings)
 };
 
 // Position type id
 enum VIW_ID_Pos
 {
     VIW_ID_POS_NONE,
-    VIW_ID_POS_RIGID,
-    VIW_ID_POS_RIGID_ABS,
-    VIW_ID_POS_POINTER,
-    VIW_ID_POS_POINTER_ABS,
-    VIW_ID_POS_SINGLE,
-    VIW_ID_POS_BIAS
-};
-
-// Size copy type id
-enum VIW_ID_SizeCopy
-{
-    VIW_ID_SIZECOPY_WIDTH,
-    VIW_ID_SIZECOPY_HEIGHT
+    VIW_ID_POS_RIGID,       // Define the position using a number relative to bounding box
+    VIW_ID_POS_RIGID_ABS,   // Defines the position using a number relative to window
+    VIW_ID_POS_POINTER,     // Defines the position using a number from a pointer relative to bounding box
+    VIW_ID_POS_POINTER_ABS, // Defines the position using a number from a pointer relative to window
+    VIW_ID_POS_SINGLE,      // Defines the position from a single object
+    VIW_ID_POS_BIAS         // Defines the position using 2 objects
 };
 
 // Size type id
 enum VIW_ID_Size
 {
     VIW_ID_SIZE_NONE,
-    VIW_ID_SIZE_RIGID,
-    VIW_ID_SIZE_POINTER,
-    VIW_ID_SIZE_DIFF,
-    VIW_ID_SIZE_COPY
+    VIW_ID_SIZE_RIGID,   // A set number
+    VIW_ID_SIZE_POINTER, // A pointer to a number
+    VIW_ID_SIZE_DIFF,    // A difference between to objects
+    VIW_ID_SIZE_COPY     // Copy the size from somewhere else
 };
 
 // Rect type id
 enum VIW_ID_Rect
 {
     VIW_ID_RECT_NONE,
-    VIW_ID_RECT_STRETCH,
-    VIW_ID_RECT_ORIGIN
+    VIW_ID_RECT_STRETCH, // Stretch between 2 objects
+    VIW_ID_RECT_ORIGIN   // Define an origin and a size
 };
 
-// Shape type id
+// Shape type id, how to get the shape
 enum VIW_ID_Shape
 {
     VIW_ID_SHAPE_NONE,
-    VIW_ID_SHAPE_COPY,
-    VIW_ID_SHAPE_ADVANCED,
-    VIW_ID_SHAPE_WINDOW
+    VIW_ID_SHAPE_COPY,     // Copy shape from reference
+    VIW_ID_SHAPE_ADVANCED, // Define shape using data
+    VIW_ID_SHAPE_WINDOW    // Copy shape from window (used for the roots mostly)
 };
 
 // Property id
-enum VIW_ID_Property
+enum _VIW_ID_Property
 {
     VIW_ID_PROPERTY_NONE,
     VIW_ID_PROPERTY_BASE,
@@ -77,8 +70,17 @@ enum VIW_ID_Property
     VIW_ID_PROPERTY_GRAPHICSTEXT
 };
 
+// General property flags
+enum _VIW_ID_PropertyFlags
+{
+    VIW_ID_PROPERTYFLAGS_NONE,
+    VIW_ID_PROPERTYFLAGS_EVENT,
+    VIW_ID_PROPERTYFLAGS_GRAPHICS,
+    VIW_ID_PROPERTYFLAGS_SCRIPT
+};
+
 // Return values for error
 #define VIW_ID_RETURNERROR_POINTER (NULL)
 #define VIW_ID_RETURNERROR_INT32_T (-2147483648)
 
-#endif
+#endif // VIEWS_CORE_DEFINITIONS_ID_H_INCLUDED
