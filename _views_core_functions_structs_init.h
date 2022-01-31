@@ -37,28 +37,13 @@ void _VIW_InitStructChild(VIW_Child *Struct)
 
 void _VIW_InitStructProperty(VIW_Property *Struct)
 {
-    /*
-    Struct->data = NULL;
-    Struct->_destroyFunc = NULL;
-    Struct->_updateFunc = NULL;
-    Struct->_runEventFunc = NULL;
-    Struct->_runScriptFunc = NULL;
-    Struct->_drawGraphicsFunc = NULL;
-    Struct->_type = _VIW_ID_PROPERTY_NONE;
-    Struct->_nextBase = NULL;
-    Struct->_orderEvent = 0;
-    Struct->_orderScript = 0;
-    Struct->_orderGraphics = 0;
-    Struct->_ownScript = NULL;
-    Struct->_ownEventID = NULL;
-    */
-
     Struct->data = NULL;
     Struct->order = 0;
     Struct->_type = _VIW_ID_PROPERTY_NONE;
     Struct->_updateFunc = NULL;
     Struct->_destroyFunc = NULL;
     Struct->_runFunc = NULL;
+    Struct->_updateOrderFunc = NULL;
     Struct->_runType = _VIW_ID_PROPERTYTYPE_NONE;
     Struct->_nextBase = NULL;
 }

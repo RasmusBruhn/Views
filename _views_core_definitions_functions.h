@@ -33,13 +33,10 @@ void VIW_DestroyView(VIW_View *View);
 // Returns nothing
 void VIW_Quit(void);
 
-// Creates a new empty view with a child with base property
+// Creates a new empty view which copies its size from the parent
 // Returns the view, NULL on error
-// Parent: If this view is a "base" then it is the parent, if it has a "base" child then that is the parent, but one must be a "base"
-// OrderScript: The order to determine location in script list
-// OrderEvent: The order to determine location in event list
-// OrderGraphics: The order to determine location in graphics list
-VIW_View *VIW_CreateSubView(VIW_View *Parent, uint32_t OrderScript, uint32_t OrderEvent, uint32_t OrderGraphics);
+// Parent: The parent of this view from which it will copy the size
+VIW_View *VIW_CreateSubView(VIW_View *Parent);
 
 // Creates a view with a base property
 // Returns the view on success and NULL on error
@@ -47,15 +44,7 @@ VIW_View *VIW_CreateSubView(VIW_View *Parent, uint32_t OrderScript, uint32_t Ord
 // OrderScript: The order to determine location in script list
 // OrderEvent: The order to determine location in event list
 // OrderGraphics: The order to determine location in graphics list
-VIW_View *VIW_CreateBaseView(VIW_View *Parent, uint32_t OrderScript, uint32_t OrderEvent, uint32_t OrderGraphics);
-
-// Creates a view with a script property
-// Returns the view on success and NULL on error
-// Parent: If this view is a "base" then it is the parent, if it has a "base" child then that is the parent, but one must be a "base"
-// Time: The next time when the script should activate
-// Increase: The amount of time to increase Time with on every activation
-// Order: The order to determine location in script list
-VIW_View *VIW_CreateScriptView(VIW_View *Parent, uint64_t Time, uint64_t Increase, uint32_t Order);
+VIW_View *VIW_CreateBaseView(VIW_View *Parent, int32_t Order);
 
 // Initializes the advanced shape data for a view, allowing it to be used
 // Returns true on success and false on error
@@ -74,56 +63,6 @@ bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, V
 // Returns true on success and false on error
 // View: The view for which to add the peroperty
 bool VIW_CreatePropertyBase(VIW_View *View);
-
-// Creates the script property for a view
-// Returns true on success and false on error
-// View: The view for which to add the peroperty
-//bool VIW_CreatePropertyScript(VIW_View *View);
-
-// Run
-
-// Run a script (functions) from view (if it has a script property), distribute script activation (if it has a base property)
-// Returns true on success and false on error
-// View: The view to run script from
-//bool VIW_RunScript(VIW_View *View, uint64_t Time);
-
-// Run an event from the view (if it has an event property), distribute event activation (if it has a base property)
-// Returns true on success and false on error
-// View: The view to run event from
-// EventID: The ID of the event
-// MouseX: The x position of the mouse relative to parent view
-// MouseY: The y position of the mouse relative to parent view
-//bool VIW_RunEvent(VIW_View *View, uint32_t EventID, int32_t MouseX, int32_t MouseY);
-
-// Draw the graphics from this view (if it has a graphics property), distribute graphics activation (if it has a base property)
-// Returns true on success and false on error
-// View: The view to draw
-// Rend: The renderer to draw to
-//bool VIW_DrawGraphics(VIW_View *View, SDL_Renderer *Rend);
-
-// Updates the event order
-// Returns true on success and false on error
-// View: The view to update the order for
-// Order: The new event order value for the view
-//bool VIW_UpdateEventOrder(VIW_View *View, uint32_t Order);
-
-// Updates the sript order
-// Returns true on success and false on error
-// View: The view to update the order for
-// Order: The new script order value for the view
-//bool VIW_UpdateScriptOrder(VIW_View *View, uint32_t Order);
-
-// Updates the graphics draw order
-// Returns true on success and false on error
-// View: The view to update the order for
-// Order: The new graphics draw order value for the view
-//bool VIW_UpdateGraphicsOrder(VIW_View *View, uint32_t Order);
-
-// Updates the time before next sript activation for a view
-// Returns true on success and false on error
-// View: The view to update time for
-// Time: The new time
-//bool VIW_UpdateScriptTime(VIW_View *View, uint64_t Time);
 
 // Internal functions
 
@@ -291,45 +230,6 @@ bool _VIW_RemoveFromViewList(VIW_ViewList *List, VIW_View *View);
 // List: The list to clean
 void _VIW_CleanViewList(VIW_ViewList *List);
 
-// Adds an event to the event list
-// Returns true on success and false on error
-// List: The list to add an event to
-// Event: The event to add to the list
-bool _VIW_AddToEventList(VIW_EventList *List, VIW_Event *Event);
-
-// Removes an event from a list
-// Returns true on success and false on error
-// List: The list to remove an event from
-// Event: The event to remove from the list
-void _VIW_RemoveFromEventList(VIW_EventList *List, VIW_Event *Event);
-
-// Cleans up a list, removes all events and initializes all
-// Returns nothing
-// List: The list to clean
-void _VIW_CleanEventList(VIW_EventList *List);
-
-// Adds a script to the sript list
-// Returns true on success and false on error
-// List: The list to add a script to
-// Script: The script to add to the list
-bool _VIW_AddToScriptList(VIW_ScriptList *List, VIW_Script *Script);
-
-// Removes a script from a list
-// Returns true on success and false on error
-// List: The list to remove a script from
-// Script: The script to remove from the list
-void _VIW_RemoveFromScriptList(VIW_ScriptList *List, VIW_Script *Script);
-
-// Cleans up a list, removes all scripts and initializes all
-// Returns nothing
-// List: The list to clean
-void _VIW_CleanScriptList(VIW_ScriptList *List);
-
-// Finds the next base view
-// Returns the base view on success and NULL on error
-// View: The view for which to find the next ancestor which is a base
-VIW_View *_VIW_FindNextBase(VIW_View *View);
-
 // Initialise structs
 
 // Initializes the structure
@@ -440,50 +340,6 @@ void _VIW_InitStructReference(VIW_Reference *Struct);
 // Initializes the structure
 // Returns nothing
 // Struct: The structure to initialize
-void _VIW_InitStructEvent(VIW_Event *Struct);
-
-// Initializes the structure
-// Returns nothing
-// Struct: The structure to initialize
-void _VIW_InitStructEventList(VIW_EventList *Struct);
-
-// Initializes the structure
-// Returns nothing
-// Struct: The structure to initialize
-void _VIW_InitStructScript(VIW_Script *Struct);
-
-// Initializes the structure
-// Returns nothing
-// Struct: The structure to initialize
-void _VIW_InitStructScriptList(VIW_ScriptList *Struct);
-
-// Initializes the structure
-// Returns nothing
-// Struct: The structure to initialize
 void _VIW_InitStructPropertyBase(VIW_PropertyBase *Struct);
-
-// Run
-
-// Updates the property "base"
-// Returns true on success and false on error
-// View: The view which holds the property
-bool _VIW_UpdatePropertyBase(VIW_View *View);
-
-// Updates the order of one script in a script list
-// Returns true on success and false on error
-// List: The list to update
-// Script: The script to change the position of
-bool _VIW_UpdateScriptList(VIW_ScriptList *List, VIW_Script *Script);
-
-// Updates the order of one graphic view in a graphics list
-// Returns true on success and false on error
-// List: The list to update
-// View: The view to change the position of
-bool _VIW_UpdateGraphicsList(VIW_ViewList *List, VIW_View *View);
-
-// Finds the base view, either the view itself or it's child
-// Returns the base view, NULL on error
-// View: The view to find base at
-VIW_View *_VIW_FindBase(VIW_View *View);
 
 #endif

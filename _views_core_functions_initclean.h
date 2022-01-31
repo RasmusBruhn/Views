@@ -58,11 +58,9 @@ VIW_View *VIW_CreateRoot(SDL_Window *Window, SDL_Renderer *Rend)
 
     return Root;
 }
-// MISSING
+
 void VIW_DestroyRoot(VIW_View *Root)
 {
-    DBG_SessionStart("VIW_DestroyRoot");
-
     extern VIW_ViewList _VIW_RootList;
 
     // Remove it from root list
@@ -70,21 +68,16 @@ void VIW_DestroyRoot(VIW_View *Root)
     
     // Destroy the view
     VIW_DestroyView(Root);
-
-    DBG_SessionEnd();
 }
-// MISSING
+
 VIW_View *VIW_CreateViewWithPos(VIW_View *Parent, uint32_t ChildPos)
 {
-    DBG_SessionStart("VIW_CreateViewWithPos");
-
     // Get memory for the view
     VIW_View *View = (VIW_View *)DBG_Malloc(sizeof(VIW_View));
 
     if (View == NULL)
     {
         _VIW_AddErrorForeign(_VIW_ID_ERRORID_CREATEVIEW_MALLOC, strerror(errno), _VIW_STRING_ERROR_MALLOC);
-        DBG_SessionEnd();
         return NULL;
     }
 
@@ -92,7 +85,7 @@ VIW_View *VIW_CreateViewWithPos(VIW_View *Parent, uint32_t ChildPos)
     _VIW_InitStructView(View);
 
     // Get the next base
-    if (Parent->property._type == VIW_ID_PROPERTY_BASE)
+    if (Parent->property._type == _VIW_ID_PROPERTY_BASE)
         View->property._nextBase = Parent;
 
     else
@@ -106,9 +99,8 @@ VIW_View *VIW_CreateViewWithPos(VIW_View *Parent, uint32_t ChildPos)
     // Add it to list of children
     if (!_VIW_AddToViewListWithPos(&Parent->_child.list, View, ChildPos))
     {
-        DBG_Free(View);
+        free(View);
         _VIW_AddError(_VIW_ID_ERRORID_CREATEVIEW_CHILDLIST, _VIW_STRING_ERROR_ADDCHILDLIST);
-        DBG_SessionEnd();
         return NULL;
     }
 
@@ -130,7 +122,6 @@ VIW_View *VIW_CreateViewWithPos(VIW_View *Parent, uint32_t ChildPos)
     View->_parent.root = Parent->_parent.root;
     View->_parent.childPos = ChildPos;
 
-    DBG_SessionEnd();
     return View;
 }
 
@@ -167,66 +158,42 @@ void VIW_DestroyView(VIW_View *View)
     // Free the view
     DBG_Free(View);
 }
-// MISSING
+
 void VIW_Quit(void)
 {
     // Go through all roots and remove them
     extern VIW_ViewList _VIW_RootList;
 
-    for (VIW_View **EndList = _VIW_RootList.list, **ViewList = EndList + _VIW_RootList.count; ViewList > EndList; --ViewList)
-        VIW_DestroyRoot(*(ViewList - 1));
+    for (VIW_View **EndList = _VIW_RootList.list, **ViewList = EndList + _VIW_RootList.count - 1; ViewList >= EndList; --ViewList)
+        VIW_DestroyRoot(*ViewList);
 }
-// MISSING
-VIW_View *VIW_CreateSubView(VIW_View *Parent, uint32_t OrderScript, uint32_t OrderEvent, uint32_t OrderGraphics)
+
+VIW_View *VIW_CreateSubView(VIW_View *Parent)
 {
-    DBG_SessionStart("VIW_CreateSubView");
-
-    // Find next base
-    VIW_View *NextBase = _VIW_FindBase(Parent);
-
-    if (NextBase == NULL)
-    {
-        _VIW_AddError(_VIW_ID_ERRORID_CREATESUBVIEW_NEXTBASE, _VIW_STRING_ERROR_NOBASE);
-        DBG_SessionEnd();
-        return NULL;
-    }
-
     // Create the view
-    VIW_View *View = VIW_CreateView(NextBase);
+    VIW_View *View = VIW_CreateView(Parent);
 
     if (View == NULL)
     {
         _VIW_AddError(_VIW_ID_ERRORID_CREATESUBVIEW_VIEW, _VIW_STRING_ERROR_CREATEVIEW);
-        DBG_SessionEnd();
         return NULL;
     }
 
-    // Create base view
-    VIW_View *BaseView = VIW_CreateBaseView(View, OrderScript, OrderEvent, OrderGraphics);
+    // Add the shape data
+    View->shapeData.type = VIW_ID_SHAPE_COPY;
+    View->shapeData.data.ref.view = VIW_ID_RELATION_PARENT;
 
-    if (BaseView == NULL)
-    {
-        DBG_Free(View);
-        _VIW_AddError(_VIW_ID_ERRORID_CREATESUBVIEW_BASE, _VIW_STRING_ERROR_CREATEBASE);
-        DBG_SessionEnd();
-        return NULL;
-    }
-
-    DBG_SessionEnd();
     return View;
 }
 // MISSING
-VIW_View *VIW_CreateBaseView(VIW_View *Parent, uint32_t OrderScript, uint32_t OrderEvent, uint32_t OrderGraphics)
+VIW_View *VIW_CreateBaseView(VIW_View *Parent, int32_t Order)
 {
-    DBG_SessionStart("VIW_CreateBaseView");
-
     // Create view
     VIW_View *View = VIW_CreateView(Parent);
 
     if (View == NULL)
     {
         _VIW_AddError(_VIW_ID_ERRORID_CREATEBASEVIEW_VIEW, _VIW_STRING_ERROR_CREATEVIEW);
-        DBG_SessionEnd();
         return NULL;
     }
 
@@ -235,20 +202,9 @@ VIW_View *VIW_CreateBaseView(VIW_View *Parent, uint32_t OrderScript, uint32_t Or
     {
         VIW_DestroyView(View);
         _VIW_AddError(_VIW_ID_ERRORID_CREATEBASEVIEW_PROPERTY, _VIW_STRING_ERROR_ADDBASEPROPERTY);
-        DBG_SessionEnd();
         return NULL;
     }
 
-    // Set order
-    if (!VIW_UpdateScriptOrder(View, OrderScript))
-    {
-        VIW_DestroyView(View);
-        _VIW_AddError(_VIW_ID_ERRORID_CREATEBASEVIEW_ORDERSCRIPT, _VIW_STRING_ERROR_UPDATESCRIPTORDER);
-        DBG_SessionEnd();
-        return NULL;
-    }
-
-    DBG_SessionEnd();
     return View;
 }
 // MISSING
@@ -411,6 +367,9 @@ bool VIW_CreatePropertyBase(VIW_View *View)
             return false;
         }
 
+        // Change the next base
+        NewView->property._nextBase = View->property._nextBase;
+
         // Add to the list
         Property->_list.list[Count] = NewView;
     }
@@ -542,28 +501,6 @@ void _VIW_CleanViewList(VIW_ViewList *List)
 
     // Initialize
     _VIW_InitStructViewList(List);
-}
-
-VIW_View *_VIW_FindNextBase(VIW_View *View)
-{
-    // Check if it is a root
-    if (View->_parent.root == View)
-    {
-        _VIW_SetError(_VIW_ID_ERRORID_FINDNEXTBASE_ROOT, _VIW_STRING_ERROR_ROOTNEXTBASE);
-        return NULL;
-    }
-
-    // Find the next base
-    VIW_View *NextBase;
-
-    for (NextBase = View->_parent.parent; NextBase->property._type != _VIW_ID_PROPERTY_BASE; NextBase = NextBase->_parent.parent)
-        if (NextBase == NextBase->_parent.root)
-        {
-            _VIW_SetError(_VIW_ID_ERRORID_FINDNEXTBASE_NOBASE, _VIW_STRING_ERROR_NEXTBASE);
-            return NULL;
-        }
-
-    return NextBase;
 }
 
 /*

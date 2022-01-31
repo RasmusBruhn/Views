@@ -199,14 +199,15 @@ struct __VIW_FlagsSet
 // View properties, the special properties for a view
 struct __VIW_Property
 {
-    void *data;                           // The property data
-    uint32_t order;                       // The order in which it should use the run function, lowest order view runs first
-    enum _VIW_ID_Property _type;          // The type of view property
-    bool (*_updateFunc)(VIW_View *View);  // The function when the view has updated its shape
-    void (*_destroyFunc)(VIW_View *View); // The function which destroys the property
-    bool (*_runFunc)(VIW_View *View);     // The function to run when the view is activated
-    enum _VIW_ID_PropertyType _runType;   // The type of run function that it uses (and the type the order is)
-    VIW_View *_nextBase;                  // The base up next in the hierarchy
+    void *data;                               // The property data
+    int32_t order;                            // The order in which it should use the run function, lowest order view runs first
+    enum _VIW_ID_Property _type;              // The type of view property
+    bool (*_updateFunc)(VIW_View *View);      // The function when the view has updated its shape
+    void (*_destroyFunc)(VIW_View *View);     // The function which destroys the property
+    bool (*_runFunc)(VIW_View *View);         // The function to run when the view is activated
+    bool (*_updateOrderFunc)(VIW_View *View); // Updates the order of sub views
+    enum _VIW_ID_PropertyType _runType;       // The type of run function that it uses (and the type the order is)
+    VIW_View *_nextBase;                      // The base up next in the hierarchy
 };
 
 // Children
