@@ -2,7 +2,7 @@
 #ifndef VIEWS_CORE_FUNCTIONS_STRUCTS_INIT_H_INCLUDED
 #define VIEWS_CORE_FUNCTIONS_STRUCTS_INIT_H_INCLUDED
 
-#include <Views.h>
+#include "Views.h"
 
 void _VIW_InitStructViewList(VIW_ViewList *Struct)
 {
