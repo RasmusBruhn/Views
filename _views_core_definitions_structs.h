@@ -3,9 +3,6 @@
 #define VIEWS_CORE_DEFINITIONS_STRUCTS_H_INCLUDED
 
 #include "Views.h"
-#include <stdinc.h>
-#include <SDL2/SDL.h>
-#include <Objects.h>
 
 // Structures
 typedef struct __VIW_View VIW_View;
