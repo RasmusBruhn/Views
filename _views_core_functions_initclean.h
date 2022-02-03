@@ -163,9 +163,12 @@ void VIW_Quit(void)
 {
     // Go through all roots and remove them
     extern VIW_ViewList _VIW_RootList;
-
-    for (VIW_View **EndList = _VIW_RootList.list, **ViewList = EndList + _VIW_RootList.count - 1; ViewList >= EndList; --ViewList)
-        VIW_DestroyRoot(*ViewList);
+    
+    for (VIW_View **EndList = _VIW_RootList.list, **ViewList = EndList + _VIW_RootList.count; ViewList > EndList; --ViewList)
+        VIW_DestroyRoot(*(ViewList - 1));
+        
+    // Clear all the errors
+    VIW_ClearArchive();
 }
 
 VIW_View *VIW_CreateSubView(VIW_View *Parent)
@@ -275,14 +278,14 @@ bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, V
                     return false;
                 }
 
-                for (SiblingRelation = Relation->_parent.parent->_child.list.list + Relation->_parent.childPos - 1; SiblingRelation >= Relation->_parent.parent->_child.list.list; --SiblingRelation)
-                    if (*SiblingRelation == ID)
+                for (SiblingRelation = Relation->_parent.parent->_child.list.list + Relation->_parent.childPos; SiblingRelation > Relation->_parent.parent->_child.list.list; --SiblingRelation)
+                    if (*(SiblingRelation - 1) == ID)
                     {
                         ID->_flags.updateAllSiblings = true;
                         break;
                     }
 
-                if (SiblingRelation >= Relation->_parent.parent->_child.list.list)
+                if (SiblingRelation > Relation->_parent.parent->_child.list.list)
                     break;
             } while ((Relation = Relation->_parent.parent) != ID);
 
@@ -346,8 +349,8 @@ bool VIW_CreatePropertyBase(VIW_View *View)
         // Make sure everything is ok
         if (NewView == NULL)
         {
-            for (VIW_View **ViewList = Property->_list.list + Count - 1, **ViewListEnd = Property->_list.list; ViewList >= ViewListEnd; --ViewList)
-                VIW_DestroyView(*ViewList);
+            for (VIW_View **ViewList = Property->_list.list + Count, **ViewListEnd = Property->_list.list; ViewList > ViewListEnd; --ViewList)
+                VIW_DestroyView(*(ViewList - 1));
 
             free(Property->_list.list);
             free(Property);
@@ -456,14 +459,12 @@ bool _VIW_AddToViewListWithPos(VIW_ViewList *List, VIW_View *View, uint32_t Pos)
 
 bool _VIW_RemoveFromViewList(VIW_ViewList *List, VIW_View *View)
 {
-    extern uint32_t VIW_ErrorType;
-
     // Remove object
     VIW_View **NewList = (VIW_View **)_VIW_RemoveFromList((void **)List->list, List->count, View);
 
     if (NewList == NULL && List->count > 1)
     {
-        if (VIW_ErrorType <= 1)
+        if (VIW_GetErrorType() <= VIW_ID_ERRORTYPE_WARNING)
             _VIW_AddError(_VIW_ID_ERRORID_REMOVEFROMVIEWLIST_WARNING, _VIW_STRING_ERROR_REMOVEFROMLIST);
 
         else

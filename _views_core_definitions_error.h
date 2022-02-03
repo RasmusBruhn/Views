@@ -155,9 +155,6 @@ enum _VIW_ID_ErrorID
 #define _VIW_STRING_ERROR_CREATEVIEW "Unable to create view"
 #define _VIW_STRING_ERROR_CREATEBASE "Unable to create \"Base\" view"
 
-// Remove error
-#define _VIW_STRING_ERROR_REMOVEFROMLIST "Unable to remove element from list"
-
 // Perform error
 #define _VIW_STRING_ERROR_ADDPROPERTY "Unable to add property"
 #define _VIW_STRING_ERROR_ADDBASEPROPERTY "Unable to add \"Base\" property"
@@ -177,7 +174,7 @@ enum _VIW_ID_ErrorID
 #define _VIW_STRING_ERROR_SCRIPT "Error when running script"
 #define _VIW_STRING_ERROR_NEXTBASE "There were no direct ancestor with a \"base\" property"
 #define _VIW_STRING_ERROR_ADDTOLIST "Unable to add object to list"
-#define _VIW_STRING_ERROR_REMOVEFROMLIST "Unable to remove object from list"
+#define _VIW_STRING_ERROR_REMOVEFROMLIST "Unable to remove element from list"
 #define _VIW_STRING_ERROR_SORTLIST "Unable to sort list"
 #define _VIW_STRING_ERROR_NOSCRIPT "No script is defined"
 #define _VIW_STRING_ERROR_ROOTNEXTBASE "A root has no next base"

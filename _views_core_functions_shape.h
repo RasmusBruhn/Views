@@ -357,7 +357,7 @@ int32_t _VIW_GetSize(VIW_View *View, VIW_Size *SizeData, int32_t *(*GetPos)(VIW_
 int32_t _VIW_GetSizeCopy(VIW_View *View, VIW_Reference *CopyRef, int32_t *(*GetSize)(VIW_View *View))
 {
     // Get the reference view
-    VIW_View *RefView = _VIW_FindRefView(View, &CopyRef);
+    VIW_View *RefView = _VIW_FindRefView(View, CopyRef);
 
     if (RefView == NULL)
     {
