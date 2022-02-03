@@ -78,8 +78,8 @@ union ___VIW_Pos
 // Position, includes data to find a position, like x or y
 struct __VIW_Pos
 {
-    enum VIW_ID_Pos type; // How the position is to be determined, VIW_ID_Pos
-    _VIW_Pos data;        // The data to determine the position
+    enum VIW_ID_Pos type;    // How the position is to be determined, VIW_ID_Pos
+    _VIW_Pos data;           // The data to determine the position
 };
 
 // Data to find the distance between 2 points

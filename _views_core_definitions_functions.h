@@ -124,8 +124,9 @@ int32_t _VIW_GetSize(VIW_View *View, VIW_Size *SizeData, int32_t *(*GetPos)(VIW_
 // Copies the size from another view
 // Returns the size, VIW_ID_RETURNERROR_INT32_T on error
 // View: The view for which to calculate the size
-// SizeData: The SizeCopy structure to get the size
-int32_t _VIW_GetSizeCopy(VIW_View *View, VIW_SizeCopy *SizeData);
+// CopyRef: The reference structure to get the size from
+// GetSize: The function to retrieve the size
+int32_t _VIW_GetSizeCopy(VIW_View *View, VIW_Reference *CopyRef, int32_t *(*GetSize)(VIW_View *View));
 
 // Gets a size by finding the difference between 2 positions
 // Returns the size and VIW_ID_RETURNERROR_INT32_T on error
