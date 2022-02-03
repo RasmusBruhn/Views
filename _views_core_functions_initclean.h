@@ -42,7 +42,7 @@ VIW_View *VIW_CreateRoot(SDL_Window *Window, SDL_Renderer *Rend)
 
     if (!_VIW_AddToViewList(&_VIW_RootList, Root))
     {
-        DBG_Free(Root);
+        free(Root);
         _VIW_AddError(_VIW_ID_ERRORID_CREATEROOT_LIST, _VIW_STRING_ERROR_ADDROOTLIST);
         return NULL;
     }
@@ -73,7 +73,7 @@ void VIW_DestroyRoot(VIW_View *Root)
 VIW_View *VIW_CreateViewWithPos(VIW_View *Parent, uint32_t ChildPos)
 {
     // Get memory for the view
-    VIW_View *View = (VIW_View *)DBG_Malloc(sizeof(VIW_View));
+    VIW_View *View = (VIW_View *)malloc(sizeof(VIW_View));
 
     if (View == NULL)
     {
@@ -156,7 +156,7 @@ void VIW_DestroyView(VIW_View *View)
     }
 
     // Free the view
-    DBG_Free(View);
+    free(View);
 }
 
 void VIW_Quit(void)
@@ -185,8 +185,8 @@ VIW_View *VIW_CreateSubView(VIW_View *Parent)
 
     return View;
 }
-// MISSING
-VIW_View *VIW_CreateBaseView(VIW_View *Parent, int32_t Order)
+
+VIW_View *VIW_CreateBaseView(VIW_View *Parent)
 {
     // Create view
     VIW_View *View = VIW_CreateView(Parent);
@@ -207,44 +207,37 @@ VIW_View *VIW_CreateBaseView(VIW_View *Parent, int32_t Order)
 
     return View;
 }
-// MISSING
+
 bool VIW_UseAdvancedShapeData(VIW_View *View)
 {
-    DBG_SessionStart("VIW_UseAdvancedShapeData");
-
     // Check if it is already initialized
-    if (View->shapeData.data != NULL)
-        _VIW_SetError(_VIW_ID_ERRORID_USEADVANCEDSHAPEDATA_INIT, _VIW_STRING_ERROR_DATAINITIALIZED);
-
-    else
+    if (View->shapeData.type == VIW_ID_SHAPE_ADVANCED)
     {
-        // If it is not initialized, get memory
-        View->shapeData.data = (VIW_Rect *)DBG_Malloc(sizeof(VIW_Rect));
+        _VIW_SetError(_VIW_ID_ERRORID_USEADVANCEDSHAPEDATA_INIT, _VIW_STRING_ERROR_DATAINITIALIZED);
+        return true;
+    }
 
-        if (View->shapeData.data == NULL)
-        {
-            _VIW_AddErrorForeign(_VIW_ID_ERRORID_USEADVANCEDSHAPEDATA_MALLOC, strerror(errno), _VIW_STRING_ERROR_MALLOC);
-            DBG_SessionEnd();
-            return false;
-        }
+    // If it is not initialized, get memory
+    View->shapeData.data.data = (VIW_Rect *)malloc(sizeof(VIW_Rect));
+
+    if (View->shapeData.data.data == NULL)
+    {
+        _VIW_AddErrorForeign(_VIW_ID_ERRORID_USEADVANCEDSHAPEDATA_MALLOC, strerror(errno), _VIW_STRING_ERROR_MALLOC);
+        return false;
     }
 
     // Set type
     View->shapeData.type = VIW_ID_SHAPE_ADVANCED;
 
     // Initialize the shape data
-    _VIW_InitStructRect(View->shapeData.data);
+    _VIW_InitStructRect(View->shapeData.data.data);
 
-    DBG_SessionEnd();
     return true;
 }
-// MISSING
+
 bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, VIW_View *ID)
 {
-    DBG_SessionStart("VIW_AddRef");
-
-    bool Return = true;
-    Ref->_ref = NULL;
+    Ref->ref = NULL;
     VIW_View *Relation = View;
     VIW_View **SiblingRelation;
 
@@ -265,7 +258,6 @@ bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, V
             if (View->_parent.childPos == 0)
             {
                 _VIW_SetError(_VIW_ID_ERRORID_ADDREF_FIRSTCHILD, _VIW_STRING_ERROR_FIRSTCHILD);
-                DBG_SessionEnd();
                 return false;
             }
 
@@ -274,16 +266,13 @@ bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, V
             break;
 
         case (VIW_ID_RELATION_ID):
-            Ref->_ref = ID;
-
             // Find the relation
             do
             {
                 if (Relation == Relation->_parent.root)
                 {
                     _VIW_SetError(_VIW_ID_ERRORID_ADDREF_REFNOTFOUND, _VIW_STRING_ERROR_ILLIGALREF);
-                    Ref->_view = VIW_ID_RELATION_ID;
-                    Return = false;
+                    return false;
                 }
 
                 for (SiblingRelation = Relation->_parent.parent->_child.list.list + Relation->_parent.childPos - 1; SiblingRelation >= Relation->_parent.parent->_child.list.list; --SiblingRelation)
@@ -297,18 +286,17 @@ bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, V
                     break;
             } while ((Relation = Relation->_parent.parent) != ID);
 
+            Ref->ref = ID;
             break;
 
         default:
             _VIW_SetError(_VIW_ID_ERRORID_ADDREF_TYPE, _VIW_STRING_ERROR_UNKNOWNTYPE);
-            DBG_SessionEnd();
             return false;
     }
 
     // Set the type
-    Ref->_view = type;
+    Ref->view = type;
 
-    DBG_SessionEnd();
     return true;
 }
 
@@ -396,7 +384,7 @@ void *_VIW_AddToListWithPos(void **List, uint32_t Length, void *Object, uint32_t
     }
 
     // make list longer
-    void **NewList = (void **)DBG_Realloc(List, sizeof(void *) * (Length + 1));
+    void **NewList = (void **)realloc(List, sizeof(void *) * (Length + 1));
 
     // Error if realloc failed
     if (NewList == NULL)
@@ -449,7 +437,7 @@ void *_VIW_RemoveFromList(void **List, uint32_t Length, void *Object)
 bool _VIW_AddToViewListWithPos(VIW_ViewList *List, VIW_View *View, uint32_t Pos)
 {
     // Add view to list
-    VIW_View **NewList = (VIW_View **)_VIW_AddToListWithPos(List->list, List->count, View, Pos);
+    VIW_View **NewList = (VIW_View **)_VIW_AddToListWithPos((void **)List->list, List->count, View, Pos);
 
     if (NewList == NULL)
     {
@@ -471,7 +459,7 @@ bool _VIW_RemoveFromViewList(VIW_ViewList *List, VIW_View *View)
     extern uint32_t VIW_ErrorType;
 
     // Remove object
-    VIW_View **NewList = (VIW_View **)_VIW_RemoveFromList(List->list, List->count, View);
+    VIW_View **NewList = (VIW_View **)_VIW_RemoveFromList((void **)List->list, List->count, View);
 
     if (NewList == NULL && List->count > 1)
     {
@@ -491,16 +479,6 @@ bool _VIW_RemoveFromViewList(VIW_ViewList *List, VIW_View *View)
     --List->count;
 
     return true;
-}
-// MISSING
-void _VIW_CleanViewList(VIW_ViewList *List)
-{
-    // If there is a list, free it
-    if (List->list != NULL)
-        DBG_Free(List->list);
-
-    // Initialize
-    _VIW_InitStructViewList(List);
 }
 
 /*

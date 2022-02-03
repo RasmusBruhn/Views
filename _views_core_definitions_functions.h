@@ -44,7 +44,7 @@ VIW_View *VIW_CreateSubView(VIW_View *Parent);
 // OrderScript: The order to determine location in script list
 // OrderEvent: The order to determine location in event list
 // OrderGraphics: The order to determine location in graphics list
-VIW_View *VIW_CreateBaseView(VIW_View *Parent, int32_t Order);
+VIW_View *VIW_CreateBaseView(VIW_View *Parent);
 
 // Initializes the advanced shape data for a view, allowing it to be used
 // Returns true on success and false on error
@@ -224,11 +224,6 @@ bool _VIW_AddToViewListWithPos(VIW_ViewList *List, VIW_View *View, uint32_t Pos)
 // List: The list to remove a view from
 // View: The view to remove from the list
 bool _VIW_RemoveFromViewList(VIW_ViewList *List, VIW_View *View);
-
-// Cleans up a list, removes all views and initializes all
-// Returns nothing
-// List: The list to clean
-void _VIW_CleanViewList(VIW_ViewList *List);
 
 // Initialise structs
 
