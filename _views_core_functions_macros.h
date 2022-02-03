@@ -14,19 +14,19 @@
 #define VIW_CreateView(Parent) VIW_CreateViewWithPos(Parent, (Parent)->_child.list.count)
 
 // Activates a view
-// Returns total active
+// Returns true on success and false on error
 // View: The view to activate
-#define VIW_ActivateView(View) ((View)->data._flags.totalActive = ((View)->data._flags.active & ((View)->data.flags.active = true)))
+#define VIW_ActivateView(View) VIW_ChangeActive(View, true)
 
 // Deactivates a view
-// Returns total active
+// Returns true on success and false on error
 // View: The view to deactivate
-#define VIW_DeactivateView(View) ((View)->data._flags.totalActive = ((View)->data._flags.active & ((View)->data.flags.active = false)))
+#define VIW_DeactivateView(View) VIW_ChangeActive(View, false)
 
 // Toggles a view (If it is active then deactivate it, if it is deactive then activate it)
-// Returns total active
+// Returns true on success and false on error
 // View: The view to toggle
-#define VIW_ToggleView(View) ((View)->data._flags.totalActive = ((View)->data._flags.active & ((View)->data.flags.active = ~(View)->data.flags.active)))
+#define VIW_ToggleView(View) VIW_ChangeActive(View, !View->flags.active)
 
 // Adds a view to the view list at the end
 // Returns true on success and false on error
@@ -34,19 +34,19 @@
 // View: The view to add to the list
 #define _VIW_AddToViewList(List, View) _VIW_AddToViewListWithPos(List, View, (List)->count)
 
-// Activates a view (the hidden activation)
-// Returns total active
+// Internally activates a view
+// Returns true on success and false on error
 // View: The view to activate
-#define _VIW_ActivateView(View) ((View)->data._flags.totalActive = ((View)->data.flags.active & ((View)->data._flags.active = true)))
+#define _VIW_ActivateView(View) _VIW_ChangeActive(View, true)
 
-// Deactivates a view (the hidden activation)
-// Returns total active
+// Internally deactivates a view
+// Returns true on success and false on error
 // View: The view to deactivate
-#define _VIW_DeactivateView(View) ((View)->data._flags.totalActive = ((View)->data.flags.active & ((View)->data._flags.active = false)))
+#define _VIW_DeactivateView(View) _VIW_ChangeActive(View, false)
 
-// Toggles a view (If it is active then deactivate it, if it is deactive then activate it) (the hidden activation)
-// Returns total active
+// Internally toggles a view (If it is active then deactivate it, if it is deactive then activate it)
+// Returns true on success and false on error
 // View: The view to toggle
-#define _VIW_ToggleView(View) ((View)->data._flags.totalActive = ((View)->data.flags.active & ((View)->data._flags.active = ~(View)->data._flags.active)))
+#define _VIW_ToggleView(View) _VIW_ChangeActive(View, !View->_flags.active)
 
 #endif

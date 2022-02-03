@@ -64,6 +64,12 @@ bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, V
 // View: The view for which to add the peroperty
 bool VIW_CreatePropertyBase(VIW_View *View);
 
+// Changes the active status of a view
+// Returns true on success and false on error
+// View: The view to change the active status of
+// Active: What the ative status should be updated to
+bool VIW_ChangeActive(VIW_View *View, bool Active);
+
 // Internal functions
 
 // Set shape
@@ -225,6 +231,17 @@ bool _VIW_AddToViewListWithPos(VIW_ViewList *List, VIW_View *View, uint32_t Pos)
 // List: The list to remove a view from
 // View: The view to remove from the list
 bool _VIW_RemoveFromViewList(VIW_ViewList *List, VIW_View *View);
+
+// Changes the internal active status of a view
+// Returns true on success and false on error
+// View: The view to change the active status of
+// Active: What the ative status should be updated to
+bool _VIW_ChangeActive(VIW_View *View, bool Active);
+
+// Updates the total active of a view, run after changing the active settings
+// Returns true on success and false on error
+// View: The view to update
+bool _VIW_UpdateActive(VIW_View *View);
 
 // Initialise structs
 

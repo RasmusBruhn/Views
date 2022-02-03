@@ -481,6 +481,65 @@ bool _VIW_RemoveFromViewList(VIW_ViewList *List, VIW_View *View)
     return true;
 }
 
+bool VIW_ChangeActive(VIW_View *View, bool Active)
+{
+    // Change the active status
+    View->flags.active = Active;
+
+    // Update the total active
+    if (!_VIW_UpdateActive(View))
+    {
+        _VIW_AddError(_VIW_ID_ERRORID_CHANGEACTIVE_UPDATE, _VIW_STRING_ERROR_UPDATEACTIVE);
+        return false;
+    }
+
+    return true;
+}
+
+bool _VIW_UpdateActive(VIW_View *View)
+{
+    // Update the total active
+    bool PrevActive = View->_flags.totalActive;
+
+    View->_flags.totalActive = View->flags.active & View->_flags.active;
+
+    // If it changed update property and all children
+    if (PrevActive != View->_flags.totalActive)
+    {
+        // Update property
+        if (!View->property._updateFunc(View))
+        {
+            _VIW_AddError(_VIW_ID_ERRORID_UPDATEACTIVE_PROPERTY, _VIW_STRING_ERROR_UPDATEPROPERTY);
+            return false;
+        }
+
+        // Update the children
+        for (VIW_View **ViewList = View->_child.list.list, **EndList = View->_child.list.list + View->_child.list.count; ViewList < EndList; ++ViewList)
+            if (!_VIW_ChangeActive(*ViewList, View->_flags.totalActive))
+            {
+                _VIW_AddError(_VIW_ID_ERRORID_UPDATEACTIVE_CHILD, _VIW_STRING_ERROR_UPDATECHILD);
+                return false;
+            }
+    }
+
+    return true;
+}
+
+bool _VIW_ChangeActive(VIW_View *View, bool Active)
+{
+    // Change the active status
+    View->_flags.active = Active;
+
+    // Update the total active
+    if (!_VIW_UpdateActive(View))
+    {
+        _VIW_AddError(_VIW_ID_ERRORID_CHANGEACTIVESET_UPDATE, _VIW_STRING_ERROR_UPDATEACTIVE);
+        return false;
+    }
+
+    return true;
+}
+
 /*
 VIW_View *VIW_CreateScriptView(VIW_View *Parent, uint64_t Time, uint64_t Increase, uint32_t Order)
 {

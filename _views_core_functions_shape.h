@@ -572,7 +572,7 @@ VIW_View *_VIW_FindRefView(VIW_View *View, VIW_Reference *Ref)
 
         // The view type is unknown
         default:
-            _VIW_SetError(_VIW_ID_ERRORID_FINDREFVIEW_TYPE, _VIW_STRING_ERROR_UNKNOWNTYPE, Ref->_view);
+            _VIW_SetError(_VIW_ID_ERRORID_FINDREFVIEW_TYPE, _VIW_STRING_ERROR_UNKNOWNTYPE, Ref->view);
             return NULL;
     }
 
