@@ -8,6 +8,7 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <SDL2/SDL.h>
+#include <Objects.h>
 
 #include "_views_core_definitions_error.h"
 #include "_views_core_definitions_id.h"

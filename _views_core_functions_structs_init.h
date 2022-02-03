@@ -112,6 +112,7 @@ void _VIW_InitStructSize(VIW_Size *Struct)
 {
     Struct->type = VIW_ID_SIZE_NONE;
     Struct->scale = 1;
+    Struct->offset = 0;
 }
 
 void _VIW_InitStructSizeDiff(VIW_SizeDiff *Struct)

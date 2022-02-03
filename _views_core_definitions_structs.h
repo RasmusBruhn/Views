@@ -104,6 +104,7 @@ struct __VIW_Size
     enum VIW_ID_Size type; // How the size is determined, VIW_ID_Size
     _VIW_Size data;        // The data to determine the size
     double scale;          // How much to scale the size
+    int32_t offset;        // How much to offset the scale Size = Size0 * scale + offset
 };
 
 // Definition of rectangle (one coordinate) by setting the position of both sides of the rectangle
