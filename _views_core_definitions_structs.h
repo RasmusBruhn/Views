@@ -173,9 +173,9 @@ struct __VIW_Shape
 // Window data, information on the window in which the view is located
 struct __VIW_Window
 {
-    SDL_Window *window; // Pointer to the window it is located in
-    SDL_Renderer *rend; // Pointer to the renderer of the window
-    uint32_t ID;        // The window ID
+    SDL_Window *window;     // Pointer to the window it is located in
+    SDL_Renderer *renderer; // Pointer to the renderer of the window
+    uint32_t ID;            // The window ID
 };
 
 // Flags, all flags for the view which can be changed by user

@@ -11,7 +11,7 @@
 // Returns the root, NULL on error
 // Window: The window the root is located in
 // Rend: The renderer for the window
-VIW_View *VIW_CreateRoot(SDL_Window *Window, SDL_Renderer *Rend);
+VIW_View *VIW_CreateRoot(SDL_Window *Window, SDL_Renderer *Renderer);
 
 // Destroys a root and all its children
 // Returns true on success and false on error
@@ -198,11 +198,6 @@ int32_t *_VIW_GetH(VIW_View *View);
 // Returns true on success and false on error
 // View: The view to remove property for
 void _VIW_DestroyPropertyBase(VIW_View *View);
-
-// Destroys the script property for a view
-// Returns true on success and false on error
-// View: The view to destroy the property for
-void _VIW_DestroyPropertyScript(VIW_View *View);
 
 // Adds an object to a list at a specific position
 // Returns a pointer to the new list, NULL on error

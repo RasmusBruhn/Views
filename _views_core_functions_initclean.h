@@ -4,7 +4,7 @@
 
 #include "Views.h"
 
-VIW_View *VIW_CreateRoot(SDL_Window *Window, SDL_Renderer *Rend)
+VIW_View *VIW_CreateRoot(SDL_Window *Window, SDL_Renderer *Renderer)
 {
     // Create the new view
     VIW_View *Root = (VIW_View *)malloc(sizeof(VIW_View));
@@ -23,7 +23,7 @@ VIW_View *VIW_CreateRoot(SDL_Window *Window, SDL_Renderer *Rend)
 
     // Set window data
     Root->_window.window = Window;
-    Root->_window.rend = Rend;
+    Root->_window.renderer = Renderer;
     Root->_window.ID = SDL_GetWindowID(Window);
 
     // Make sure there were no error
@@ -93,7 +93,7 @@ VIW_View *VIW_CreateViewWithPos(VIW_View *Parent, uint32_t ChildPos)
 
     // Set window data
     View->_window.window = Parent->_window.window;
-    View->_window.rend = Parent->_window.rend;
+    View->_window.renderer = Parent->_window.renderer;
     View->_window.ID = Parent->_window.ID;
     
     // Add it to list of children
@@ -324,9 +324,9 @@ bool VIW_CreatePropertyBase(VIW_View *View)
     extern size_t _VIW_BaseFuncCount;
     
     Property->_list.count = _VIW_BaseFuncCount;
-    Property->_list.list = (VIW_View **)malloc(sizeof(VIW_View *) * _VIW_BaseFuncCount);
+    Property->_list.list = ((_VIW_BaseFuncCount == 0) ? (NULL) : (VIW_View **)malloc(sizeof(VIW_View *) * _VIW_BaseFuncCount));
 
-    if (Property->_list.list == NULL)
+    if (_VIW_BaseFuncCount > 0 && Property->_list.list == NULL)
     {
         free(Property);
         _VIW_AddErrorForeign(_VIW_ID_ERRORID_CREATEPROPERTYBASE_MALLOCLIST, strerror(errno), _VIW_STRING_ERROR_MALLOC);
@@ -511,11 +511,12 @@ bool _VIW_UpdateActive(VIW_View *View)
     if (PrevActive != View->_flags.totalActive)
     {
         // Update property
-        if (!View->property._updateFunc(View))
-        {
-            _VIW_AddError(_VIW_ID_ERRORID_UPDATEACTIVE_PROPERTY, _VIW_STRING_ERROR_UPDATEPROPERTY);
-            return false;
-        }
+        if (View->property._updateFunc != NULL)
+            if (!View->property._updateFunc(View))
+            {
+                _VIW_AddError(_VIW_ID_ERRORID_UPDATEACTIVE_PROPERTY, _VIW_STRING_ERROR_UPDATEPROPERTY);
+                return false;
+            }
 
         // Update the children
         for (VIW_View **ViewList = View->_child.list.list, **EndList = View->_child.list.list + View->_child.list.count; ViewList < EndList; ++ViewList)

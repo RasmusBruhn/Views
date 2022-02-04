@@ -71,21 +71,188 @@ int main(int argc, char **argv)
     // Check root structure
     printf("Checking root structure:\n");
 
-    printf(".flags = {.active = %u}, expected {.active = 1}", Root->flags.active);
+    printf(".flags = {.active = %u}, expected {.active = 1}\n", Root->flags.active);
     if (Root->flags.active != true)
         return 0;
 
-    printf("._flags");
+    printf("._flags = {.active = %u, .totalActive = %u, .updateNextSibling = %u, .updateAllSiblings = %u}, expected {.active = 1, .totalActive = 1, .updateNextSibling = 0, .updateAllSiblings = 0}\n", Root->_flags.active, Root->_flags.totalActive, Root->_flags.updateNextSibling, Root->_flags.updateAllSiblings);
+    if (Root->_flags.active != true || Root->_flags.totalActive != true || Root->_flags.updateNextSibling != false || Root->_flags.updateAllSiblings != false)
+        return 0;
+
+    printf("._window = {.window = %p, .renderer = %p, .ID = %u}, expected {.window = %p, .renderer = %p, .ID = %u}\n", Root->_window.window, Root->_window.renderer, Root->_window.ID, Window, Renderer, SDL_GetWindowID(Window));
+    if (Root->_window.window != Window || Root->_window.renderer != Renderer || Root->_window.ID != SDL_GetWindowID(Window))
+        return 0;
+
+    printf("._parent = {.root = %p, .parent = %p}, expected {.root = %p, .parent = %p}\n", Root->_parent.root, Root->_parent.parent, Root, NULL);
+    if (Root->_parent.root != Root || Root->_parent.parent != NULL)
+        return 0;
+
+    printf("._child = {.list = %p, .count = %u}, expected {.list = %p, .count = %u}\n", Root->_child.list.list, Root->_child.list.count, NULL, 0);
+    if (Root->_child.list.list != NULL || Root->_child.list.count != 0)
+        return 0;
+
+    printf(".shapeData = {.type = %u}, expected {.type = %u}\n", Root->shapeData.type, VIW_ID_SHAPE_WINDOW);
+    if (Root->shapeData.type != VIW_ID_SHAPE_WINDOW)
+        return 0;
+
+    printf(".property = {._type = %u, ._runType = %u, ._updateFunc = %p, ._runFunc = %p, ._destroyFunc = %p, ._nextBase = %p, .data._list.count = %u, .data._list.list = %p}, expected {._type = %u, ._runType = %u, ._updateFunc = %p, ._runFunc = %p, ._destroyFunc = %p, ._nextBase = %p, .data._list.count = %u, .data._list.list = %p}\n", Root->property._type, Root->property._runType, Root->property._updateFunc, Root->property._runFunc, Root->property._destroyFunc, Root->property._nextBase, ((VIW_PropertyBase *)Root->property.data)->_list.count, ((VIW_PropertyBase *)Root->property.data)->_list.list, _VIW_ID_PROPERTY_BASE, _VIW_ID_PROPERTY_NONE, NULL, NULL, &_VIW_DestroyPropertyBase, NULL, 0, NULL);
+    if (Root->property._type != _VIW_ID_PROPERTY_BASE || Root->property._runType != _VIW_ID_PROPERTY_NONE || Root->property._updateFunc != NULL || Root->property._runFunc != NULL || Root->property._destroyFunc != &_VIW_DestroyPropertyBase || Root->property._nextBase != NULL || ((VIW_PropertyBase *)Root->property.data)->_list.count != 0 || ((VIW_PropertyBase *)Root->property.data)->_list.list != NULL)
+        return 0;
+
+    printf("\n");
 
     // Create a child
+    VIW_View *Child = VIW_CreateView(Root);
+
+    if (Child == NULL)
+    {
+        printf("Unable to create child: %s\n", VIW_GetError());
+        return 0;
+    }
+
+    printf("Checking child data:\n");
+
+    printf(".flags = {.active = %u}, expected {.active = %u}\n", Child->flags.active, true);
+    if (Child->flags.active != true)
+        return 0;
+
+    printf("._flags = {.active = %u, .totalActive = %u, .updateNextSibling = %u, .updateAllSiblings = %u}, expected {.active = 1, .totalActive = 1, .updateNextSibling = 0, .updateAllSiblings = 0}\n", Child->_flags.active, Child->_flags.totalActive, Child->_flags.updateNextSibling, Child->_flags.updateAllSiblings);
+    if (Child->_flags.active != true || Child->_flags.totalActive != true || Child->_flags.updateNextSibling != false || Child->_flags.updateAllSiblings != false)
+        return 0;
+
+    printf("._window = {.window = %p, .renderer = %p, .ID = %u}, expected {.window = %p, .renderer = %p, .ID = %u}\n", Child->_window.window, Child->_window.renderer, Child->_window.ID, Window, Renderer, SDL_GetWindowID(Window));
+    if (Child->_window.window != Window || Child->_window.renderer != Renderer || Child->_window.ID != SDL_GetWindowID(Window))
+        return 0;
+
+    printf("._parent = {.Child = %p, .parent = %p}, expected {.Child = %p, .parent = %p}\n", Child->_parent.root, Child->_parent.parent, Root, Root);
+    if (Child->_parent.root != Root || Child->_parent.parent != Root)
+        return 0;
+
+    printf("._child = {.list = %p, .count = %u}, expected {.list = %p, .count = %u}\n", Child->_child.list.list, Child->_child.list.count, NULL, 0);
+    if (Child->_child.list.list != NULL || Child->_child.list.count != 0)
+        return 0;
+
+    printf(".shapeData = {.type = %u}, expected {.type = %u}\n", Child->shapeData.type, VIW_ID_SHAPE_NONE);
+    if (Child->shapeData.type != VIW_ID_SHAPE_NONE)
+        return 0;
+
+    printf(".property = {._type = %u, ._runType = %u, ._updateFunc = %p, ._runFunc = %p, ._destroyFunc = %p, ._nextBase = %p, .order = %d, .data = %p}, expected {._type = %u, ._runType = %u, ._updateFunc = %p, ._runFunc = %p, ._destroyFunc = %p, ._nextBase = %p, .order = %u, .data = %p}\n", Child->property._type, Child->property._runType, Child->property._updateFunc, Child->property._runFunc, Child->property._destroyFunc, Child->property._nextBase, Child->property.order, Child->property.data, _VIW_ID_PROPERTY_NONE, _VIW_ID_PROPERTY_NONE, NULL, NULL, NULL, Root, 0, NULL);
+    if (Child->property._type != _VIW_ID_PROPERTY_NONE || Child->property._runType != _VIW_ID_PROPERTY_NONE || Child->property._updateFunc != NULL || Child->property._runFunc != NULL || Child->property._destroyFunc != NULL || Child->property._nextBase != Root || Child->property.order != 0 || Child->property.data != NULL)
+        return 0;
+
+    printf("\n");
 
     // Create a child in front
+    VIW_View *FrontChild = VIW_CreateViewWithPos(Root, 0);
+
+    if (FrontChild == NULL)
+    {
+        printf("Unable to create FrontChild: %s\n", VIW_GetError());
+        return 0;
+    }
+    // Check child pos and child list
 
     // Create a child in back
+    VIW_View *BackChild = VIW_CreateView(Root);
+
+    if (BackChild == NULL)
+    {
+        printf("Unable to create BackChild: %s\n", VIW_GetError());
+        return 0;
+    }
+
+    // Check child pos and child list
 
     // Create a child in middle
+    VIW_View *MiddleChild = VIW_CreateViewWithPos(Root, 1);
+
+    if (MiddleChild == NULL)
+    {
+        printf("Unable to create MiddleChild: %s\n", VIW_GetError());
+        return 0;
+    }
+
+    // Check child pos and child list
 
     // Create a child of a child
+    VIW_View *GrandChild = VIW_CreateBaseView(Child);
+
+    if (GrandChild == NULL)
+    {
+        printf("Unable to create GrandChild: %s\n", VIW_GetError());
+        return 0;
+    }
+
+    // Check parent
+
+    // Disable view
+    if (!VIW_DeactivateView(Child))
+    {
+        printf("Unable to deactivate Child: %s\n", VIW_GetError());
+        return 0;
+    }
+
+    // Enable grand child
+    if (!VIW_ActivateView(GrandChild))
+    {
+        printf("Unable to activate GrandChild: %s\n", VIW_GetError());
+        return 0;
+    }
+
+    // Create disabled child
+    VIW_View *DisabledChild = VIW_CreateSubView(GrandChild);
+
+    if (DisabledChild == NULL)
+    {
+        printf("Unable to create DisabledChild: %s\n", VIW_GetError());
+        return 0;
+    }
+
+    // Check disable and disable of children
+
+    // Disable root
+    if (!VIW_ToggleView(Root))
+    {
+        printf("Unable to toggle root: %s\n", VIW_GetError());
+        return 0;
+    }
+
+    // Enable view
+    if (!VIW_ToggleView(Child))
+    {
+        printf("Unable to toggle Child: %s\n", VIW_GetError());
+        return 0;
+    }
+
+    // Check enable and enable of children
+
+    // Enable root
+    if (!VIW_ActivateView(Root))
+    {
+        printf("Unable to activate Root: %s\n", VIW_GetError());
+        return 0;
+    }
+
+    // Check enable of children
+
+    // Destroy child
+    VIW_DestroyView(Child);
+
+    // Check child list
+
+    // Destroy root
+    VIW_DestroyRoot(Root);
+
+    // Check root list
+
+    // Print errors
+    printf("Errors:\n");
+
+    char *String = NULL;
+    while ((String = VIW_GetArchivedError()) != NULL)
+        printf("%s\n", String);
+
+    printf("\n");
 
     // Clean up
     VIW_Quit();

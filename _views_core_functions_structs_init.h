@@ -62,7 +62,7 @@ void _VIW_InitStructFlags(VIW_Flags *Struct)
 
 void _VIW_InitStructWindow(VIW_Window *Struct)
 {
-    Struct->rend = NULL;
+    Struct->renderer = NULL;
     Struct->window = NULL;
     Struct->ID = 0;
 }
