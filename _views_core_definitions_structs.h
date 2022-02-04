@@ -181,7 +181,6 @@ struct __VIW_Window
 // Flags, all flags for the view which can be changed by user
 struct __VIW_Flags
 {
-    bool freezeShape : 1;    // If true then the shape will not update
     bool active : 1;         // If false then the view won't be updated or visible by other views
 };
 

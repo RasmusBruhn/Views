@@ -9,10 +9,6 @@ bool _VIW_UpdateShape(VIW_View *View, bool AllowSiblingUpdate)
     if (!View->_flags.totalActive)
         return true;
 
-    // Don't update the shape
-    if (View->flags.freezeShape)
-        return true;
-
     // Find the correct way to update the shape
     switch (View->shapeData.type)
     {

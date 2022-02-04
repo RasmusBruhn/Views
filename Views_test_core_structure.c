@@ -49,16 +49,6 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    // Create a child
-
-    // Create a child in front
-
-    // Create a child in back
-
-    // Create a child in middle
-
-    // Create a child of a child
-
     // Check root list
     extern VIW_ViewList _VIW_RootList;
     
@@ -77,6 +67,25 @@ int main(int argc, char **argv)
         return 0;
 
     printf("\n");
+
+    // Check root structure
+    printf("Checking root structure:\n");
+
+    printf(".flags = {.active = %u}, expected {.active = 1}", Root->flags.active);
+    if (Root->flags.active != true)
+        return 0;
+
+    printf("._flags");
+
+    // Create a child
+
+    // Create a child in front
+
+    // Create a child in back
+
+    // Create a child in middle
+
+    // Create a child of a child
 
     // Clean up
     VIW_Quit();

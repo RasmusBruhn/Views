@@ -122,6 +122,9 @@ VIW_View *VIW_CreateViewWithPos(VIW_View *Parent, uint32_t ChildPos)
     View->_parent.root = Parent->_parent.root;
     View->_parent.childPos = ChildPos;
 
+    // Set active data to the same as parent
+    View->_flags.active = View->_flags.totalActive = Parent->_flags.totalActive;
+
     return View;
 }
 

@@ -57,7 +57,6 @@ void _VIW_InitStructFlagsSet(VIW_FlagsSet *Struct)
 
 void _VIW_InitStructFlags(VIW_Flags *Struct)
 {
-    Struct->freezeShape = false;
     Struct->active = true;
 }
 
