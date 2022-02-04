@@ -199,6 +199,11 @@ int32_t *_VIW_GetH(VIW_View *View);
 // View: The view to remove property for
 void _VIW_DestroyPropertyBase(VIW_View *View);
 
+// Updates the next base when a new base property is created
+// View: The view to update all of the children for
+// Base: The new base view
+void _VIW_UpdateNextBase(VIW_View *View, VIW_View *Base);
+
 // Adds an object to a list at a specific position
 // Returns a pointer to the new list, NULL on error
 // List: The list to add the object to

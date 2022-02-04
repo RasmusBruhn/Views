@@ -142,6 +142,21 @@ int main(int argc, char **argv)
 
     printf("\n");
 
+    // Use advanced shape
+    if (!VIW_UseAdvancedShapeData(Child))
+    {
+        printf("Unable to use advanced shape on data: %s\n", VIW_GetError());
+        return 0;
+    }
+
+    printf("Checking that shape data is good:\n");
+
+    printf(".shapeData = {.type = %u}, expected {.type = %u}\n", Child->shapeData.type, VIW_ID_SHAPE_ADVANCED);
+    if (Child->shapeData.type != VIW_ID_SHAPE_ADVANCED)
+        return 0;
+
+    printf("\n");
+
     // Create a child in front
     VIW_View *FrontChild = VIW_CreateViewWithPos(Root, 0);
 
@@ -150,7 +165,25 @@ int main(int argc, char **argv)
         printf("Unable to create FrontChild: %s\n", VIW_GetError());
         return 0;
     }
-    // Check child pos and child list
+    
+    // Add a reference to the previous child
+    if (!VIW_AddRef(Child, &Child->shapeData.data.data->x.data.origin.pos.data.single.ref, VIW_ID_RELATION_SIBLING, 0))
+    {
+        printf("Unable to add a reference: %s\n", VIW_GetError());
+        return 0;
+    }
+
+    printf("Checking the reference to earlier sibling and the _flags for the sibling:\n");
+
+    printf("._flags = {.active = %u, .totalActive = %u, .updateNextSibling = %u, .updateAllSiblings = %u}, expected {.active = 1, .totalActive = 1, .updateNextSibling = 1, .updateAllSiblings = 0}\n", FrontChild->_flags.active, FrontChild->_flags.totalActive, FrontChild->_flags.updateNextSibling, FrontChild->_flags.updateAllSiblings);
+    if (FrontChild->_flags.active != true || FrontChild->_flags.totalActive != true || FrontChild->_flags.updateNextSibling != true || FrontChild->_flags.updateAllSiblings != false)
+        return 0;
+
+    printf("Reference is [.view = %u, .ref = %p], expected [.view = %u, .ref = %p]\n", Child->shapeData.data.data->x.data.origin.pos.data.single.ref.view, Child->shapeData.data.data->x.data.origin.pos.data.single.ref.ref, VIW_ID_RELATION_SIBLING, NULL);
+    if (Child->shapeData.data.data->x.data.origin.pos.data.single.ref.view != VIW_ID_RELATION_SIBLING || Child->shapeData.data.data->x.data.origin.pos.data.single.ref.ref != NULL)
+        return 0;
+
+    printf("\n");
 
     // Create a child in back
     VIW_View *BackChild = VIW_CreateView(Root);
@@ -172,7 +205,39 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    // Check child pos and child list
+    printf("Checking that flag carried on:\n");
+
+    printf("._flags = {.active = %u, .totalActive = %u, .updateNextSibling = %u, .updateAllSiblings = %u}, expected {.active = 1, .totalActive = 1, .updateNextSibling = 1, .updateAllSiblings = 0}\n", MiddleChild->_flags.active, MiddleChild->_flags.totalActive, MiddleChild->_flags.updateNextSibling, MiddleChild->_flags.updateAllSiblings);
+    if (MiddleChild->_flags.active != true || MiddleChild->_flags.totalActive != true || MiddleChild->_flags.updateNextSibling != true || MiddleChild->_flags.updateAllSiblings != false)
+        return 0;
+
+    printf("._flags for FrontChild = {.active = %u, .totalActive = %u, .updateNextSibling = %u, .updateAllSiblings = %u}, expected {.active = 1, .totalActive = 1, .updateNextSibling = 0, .updateAllSiblings = 0}\n", FrontChild->_flags.active, FrontChild->_flags.totalActive, FrontChild->_flags.updateNextSibling, FrontChild->_flags.updateAllSiblings);
+    if (FrontChild->_flags.active != true || FrontChild->_flags.totalActive != true || FrontChild->_flags.updateNextSibling != false || FrontChild->_flags.updateAllSiblings != false)
+        return 0;
+
+    printf("\n");
+
+    // Check child list
+    printf("Checking the child list of Root:\n");
+
+    printf("Number of children: %u, expected %u\n", Root->_child.list.count, 4);
+    if (Root->_child.list.count != 4)
+        return 0;
+
+    printf("The children are [%p, %p, %p, %p], expected [%p, %p, %p, %p]\n", Root->_child.list.list[0], Root->_child.list.list[1], Root->_child.list.list[2], Root->_child.list.list[3], FrontChild, MiddleChild, Child, BackChild);
+    if (Root->_child.list.list[0] != FrontChild || Root->_child.list.list[1] != MiddleChild || Root->_child.list.list[2] != Child || Root->_child.list.list[3] != BackChild)
+        return 0;
+
+    printf("\n");
+
+    // Check child pos
+    printf("Checking the child pos of all children:\n");
+
+    printf("Child pos is [%u, %u, %u, %u], expected [%u, %u, %u, %u]\n", FrontChild->_parent.childPos, MiddleChild->_parent.childPos, Child->_parent.childPos, BackChild->_parent.childPos, 0, 1, 2, 3);
+    if (FrontChild->_parent.childPos != 0 || MiddleChild->_parent.childPos != 1 || Child->_parent.childPos != 2 || BackChild->_parent.childPos != 3)
+        return 0;
+
+    printf("\n");
 
     // Create a child of a child
     VIW_View *GrandChild = VIW_CreateBaseView(Child);
@@ -239,11 +304,33 @@ int main(int argc, char **argv)
     VIW_DestroyView(Child);
 
     // Check child list
+    printf("Checking the child list of Root after removing Child:\n");
+
+    printf("Number of children: %u, expected %u\n", Root->_child.list.count, 3);
+    if (Root->_child.list.count != 3)
+        return 0;
+
+    printf("The children are [%p, %p, %p], expected [%p, %p, %p]\n", Root->_child.list.list[0], Root->_child.list.list[1], Root->_child.list.list[2], FrontChild, MiddleChild, BackChild);
+    if (Root->_child.list.list[0] != FrontChild || Root->_child.list.list[1] != MiddleChild || Root->_child.list.list[2] != BackChild)
+        return 0;
+
+    printf("\n");
 
     // Destroy root
     VIW_DestroyRoot(Root);
 
     // Check root list
+    printf("Checking root list after removing Root:\n");
+
+    printf("Found %u entries, expected %u\n", _VIW_RootList.count, 1);
+    if (_VIW_RootList.count != 1)
+        return 0;
+
+    printf("Remaining root is %p, expected %p\n", _VIW_RootList.list[0], Root2);
+    if (_VIW_RootList.list[0] != Root2)
+        return 0;
+
+    printf("\n");
 
     // Print errors
     printf("Errors:\n");

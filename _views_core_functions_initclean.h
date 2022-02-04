@@ -368,7 +368,21 @@ bool VIW_CreatePropertyBase(VIW_View *View)
         Property->_list.list[Count] = NewView;
     }
         
+    // Update children that needs a new base view
+
     return true;
+}
+
+void _VIW_UpdateNextBase(VIW_View *View, VIW_View *Base)
+{
+    // Go through all of the children
+    for (VIW_View **ViewList = View->_child.list.list, **EndList = View->_child.list.list + View->_child.list.count; ViewList < EndList; ++ViewList)
+    {
+        // Update the view
+        (*ViewList)->property._nextBase = Base;
+
+        // 
+    }
 }
 
 void _VIW_DestroyPropertyBase(VIW_View *View)
