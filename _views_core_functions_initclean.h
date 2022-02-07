@@ -361,14 +361,12 @@ bool VIW_CreatePropertyBase(VIW_View *View)
             return false;
         }
 
-        // Change the next base
-        NewView->property._nextBase = View->property._nextBase;
-
         // Add to the list
         Property->_list.list[Count] = NewView;
     }
         
     // Update children that needs a new base view
+    _VIW_UpdateNextBase(View, View);
 
     return true;
 }
@@ -381,7 +379,9 @@ void _VIW_UpdateNextBase(VIW_View *View, VIW_View *Base)
         // Update the view
         (*ViewList)->property._nextBase = Base;
 
-        // 
+        // If it is not a base itself, then do the same for all of the children
+        if ((*ViewList)->property._type != _VIW_ID_PROPERTY_BASE)
+            _VIW_UpdateNextBase(*ViewList, Base);
     }
 }
 

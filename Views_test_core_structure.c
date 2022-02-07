@@ -124,7 +124,7 @@ int main(int argc, char **argv)
     if (Child->_window.window != Window || Child->_window.renderer != Renderer || Child->_window.ID != SDL_GetWindowID(Window))
         return 0;
 
-    printf("._parent = {.Child = %p, .parent = %p}, expected {.Child = %p, .parent = %p}\n", Child->_parent.root, Child->_parent.parent, Root, Root);
+    printf("._parent = {.root = %p, .parent = %p}, expected {.root = %p, .parent = %p}\n", Child->_parent.root, Child->_parent.parent, Root, Root);
     if (Child->_parent.root != Root || Child->_parent.parent != Root)
         return 0;
 
@@ -194,8 +194,6 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    // Check child pos and child list
-
     // Create a child in middle
     VIW_View *MiddleChild = VIW_CreateViewWithPos(Root, 1);
 
@@ -249,6 +247,17 @@ int main(int argc, char **argv)
     }
 
     // Check parent
+    printf("Checking parents and next base of grand child:\n");
+
+    printf("._parent = {.root = %p, .parent = %p}, expected {.root = %p, .parent = %p}\n", GrandChild->_parent.root, GrandChild->_parent.parent, Root, Child);
+    if (GrandChild->_parent.root != Root || GrandChild->_parent.parent != Child)
+        return 0;
+
+    printf("NextBase is %p, expected %p\n", GrandChild->property._nextBase, Root);
+    if (GrandChild->property._nextBase != Root)
+        return 0;
+
+    printf("\n");
 
     // Disable view
     if (!VIW_DeactivateView(Child))
@@ -273,7 +282,47 @@ int main(int argc, char **argv)
         return 0;
     }
 
+    // Check sub view
+    printf("Checking the sub view shape and next base:\n");
+
+    printf("ShapeData.type is %u, expected %u\n", DisabledChild->shapeData.type, VIW_ID_SHAPE_COPY);
+    if (DisabledChild->shapeData.type != VIW_ID_SHAPE_COPY)
+        return 0;
+
+    printf("NextBase is %p, expected %p\n", DisabledChild->property._nextBase, GrandChild);
+    if (DisabledChild->property._nextBase != GrandChild)
+        return 0;
+
+    printf("\n");
+
     // Check disable and disable of children
+    printf("Checking disabling of view and its children:\n");
+
+    printf("Root: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", Root->flags.active, Root->_flags.active, Root->_flags.totalActive, true, true, true);
+    if (Root->flags.active != true || Root->_flags.active != true || Root->_flags.totalActive != true)
+        return 0;
+
+    printf("MiddleChild: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", MiddleChild->flags.active, MiddleChild->_flags.active, MiddleChild->_flags.totalActive, true, true, true);
+    if (MiddleChild->flags.active != true || MiddleChild->_flags.active != true || MiddleChild->_flags.totalActive != true)
+        return 0;
+
+    printf("BackChild: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", BackChild->flags.active, BackChild->_flags.active, BackChild->_flags.totalActive, true, true, true);
+    if (BackChild->flags.active != true || BackChild->_flags.active != true || BackChild->_flags.totalActive != true)
+        return 0;
+
+    printf("Child: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", Child->flags.active, Child->_flags.active, Child->_flags.totalActive, false, true, false);
+    if (Child->flags.active != false || Child->_flags.active != true || Child->_flags.totalActive != false)
+        return 0;
+
+    printf("GrandChild: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", GrandChild->flags.active, GrandChild->_flags.active, GrandChild->_flags.totalActive, true, false, false);
+    if (GrandChild->flags.active != true || GrandChild->_flags.active != false || GrandChild->_flags.totalActive != false)
+        return 0;
+
+    printf("DisabledChild: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", DisabledChild->flags.active, DisabledChild->_flags.active, DisabledChild->_flags.totalActive, true, false, false);
+    if (DisabledChild->flags.active != true || DisabledChild->_flags.active != false || DisabledChild->_flags.totalActive != false)
+        return 0;
+
+    printf("\n");
 
     // Disable root
     if (!VIW_ToggleView(Root))
@@ -290,6 +339,33 @@ int main(int argc, char **argv)
     }
 
     // Check enable and enable of children
+    printf("Checking disabling of view and its children after disabling root:\n");
+
+    printf("Root: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", Root->flags.active, Root->_flags.active, Root->_flags.totalActive, false, true, false);
+    if (Root->flags.active != false || Root->_flags.active != true || Root->_flags.totalActive != false)
+        return 0;
+
+    printf("MiddleChild: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", MiddleChild->flags.active, MiddleChild->_flags.active, MiddleChild->_flags.totalActive, true, false, false);
+    if (MiddleChild->flags.active != true || MiddleChild->_flags.active != false || MiddleChild->_flags.totalActive != false)
+        return 0;
+
+    printf("BackChild: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", BackChild->flags.active, BackChild->_flags.active, BackChild->_flags.totalActive, true, false, false);
+    if (BackChild->flags.active != true || BackChild->_flags.active != false || BackChild->_flags.totalActive != false)
+        return 0;
+
+    printf("Child: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", Child->flags.active, Child->_flags.active, Child->_flags.totalActive, true, false, false);
+    if (Child->flags.active != true || Child->_flags.active != false || Child->_flags.totalActive != false)
+        return 0;
+
+    printf("GrandChild: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", GrandChild->flags.active, GrandChild->_flags.active, GrandChild->_flags.totalActive, true, false, false);
+    if (GrandChild->flags.active != true || GrandChild->_flags.active != false || GrandChild->_flags.totalActive != false)
+        return 0;
+
+    printf("DisabledChild: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", DisabledChild->flags.active, DisabledChild->_flags.active, DisabledChild->_flags.totalActive, true, false, false);
+    if (DisabledChild->flags.active != true || DisabledChild->_flags.active != false || DisabledChild->_flags.totalActive != false)
+        return 0;
+
+    printf("\n");
 
     // Enable root
     if (!VIW_ActivateView(Root))
@@ -299,6 +375,69 @@ int main(int argc, char **argv)
     }
 
     // Check enable of children
+    printf("Checking disabling of view and its children after enabling root:\n");
+
+    printf("Root: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", Root->flags.active, Root->_flags.active, Root->_flags.totalActive, true, true, true);
+    if (Root->flags.active != true || Root->_flags.active != true || Root->_flags.totalActive != true)
+        return 0;
+
+    printf("MiddleChild: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", MiddleChild->flags.active, MiddleChild->_flags.active, MiddleChild->_flags.totalActive, true, true, true);
+    if (MiddleChild->flags.active != true || MiddleChild->_flags.active != true || MiddleChild->_flags.totalActive != true)
+        return 0;
+
+    printf("BackChild: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", BackChild->flags.active, BackChild->_flags.active, BackChild->_flags.totalActive, true, true, true);
+    if (BackChild->flags.active != true || BackChild->_flags.active != true || BackChild->_flags.totalActive != true)
+        return 0;
+
+    printf("Child: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", Child->flags.active, Child->_flags.active, Child->_flags.totalActive, true, true, true);
+    if (Child->flags.active != true || Child->_flags.active != true || Child->_flags.totalActive != true)
+        return 0;
+
+    printf("GrandChild: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", GrandChild->flags.active, GrandChild->_flags.active, GrandChild->_flags.totalActive, true, true, true);
+    if (GrandChild->flags.active != true || GrandChild->_flags.active != true || GrandChild->_flags.totalActive != true)
+        return 0;
+
+    printf("DisabledChild: {.active = %u, ._active = %u, .totalActive = %u}, expected {.active = %u, ._active = %u, .totalActive = %u}\n", DisabledChild->flags.active, DisabledChild->_flags.active, DisabledChild->_flags.totalActive, true, true, true);
+    if (DisabledChild->flags.active != true || DisabledChild->_flags.active != true || DisabledChild->_flags.totalActive != true)
+        return 0;
+
+    printf("\n");
+
+    // Add a base property
+    if (!VIW_CreatePropertyBase(Child))
+    {
+        printf("Unable to create a base property: %s\n", VIW_GetError());
+        return 0;
+    }
+
+    // Check that nextBase has updated
+    printf("Checking that the ._nextBase has updated after adding a base property:\n");
+
+    printf("Root has %p, expected %p\n", Root->property._nextBase, NULL);
+    if (Root->property._nextBase != NULL)
+        return 0;
+
+    printf("MiddleChild has %p, expected %p\n", MiddleChild->property._nextBase, Root);
+    if (MiddleChild->property._nextBase != Root)
+        return 0;
+
+    printf("BackChild has %p, expected %p\n", BackChild->property._nextBase, Root);
+    if (BackChild->property._nextBase != Root)
+        return 0;
+
+    printf("Child has %p, expected %p\n", Child->property._nextBase, Root);
+    if (Child->property._nextBase != Root)
+        return 0;
+
+    printf("GrandChild has %p, expected %p\n", GrandChild->property._nextBase, Child);
+    if (GrandChild->property._nextBase != Child)
+        return 0;
+
+    printf("DisabledChild has %p, expected %p\n", DisabledChild->property._nextBase, GrandChild);
+    if (DisabledChild->property._nextBase != GrandChild)
+        return 0;
+
+    printf("\n");
 
     // Destroy child
     VIW_DestroyView(Child);
