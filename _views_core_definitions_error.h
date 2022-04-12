@@ -25,7 +25,7 @@ enum VIW_ID_ErrorType
 };
 
 // Error id
-enum _VIW_ID_ErrorID
+enum _VIW_Core_ID_ErrorID
 {
     _VIW_ID_ERRORID_GENERAL_NONE = 0x200000000,
     _VIW_ID_ERRORID_UPDATESHAPEADVANCED_X = 0x200010200,
