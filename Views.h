@@ -10,6 +10,7 @@
 #include <SDL2/SDL.h>
 #include <Objects.h>
 
+// Core functionality
 #include "_views_core_definitions_error.h"
 #include "_views_core_definitions_id.h"
 #include "_views_core_definitions_structs.h"
@@ -19,5 +20,15 @@
 #include "_views_core_functions_shape.h"
 #include "_views_core_functions_initclean.h"
 #include "_views_core_functions_structs_init.h"
+
+// Graphics functionality
+#include "_views_graphics_definitions_error.h"
+#include "_views_graphics_definitions_structs.h"
+#include "_views_graphics_definitions_id.h"
+#include "_views_graphics_definitions_functions.h"
+#include "_views_graphics_globalvariables.h"
+#include "_views_graphics_functions_macros.h"
+#include "_views_graphics_functions_initclean.h"
+#include "_views_graphics_functions_structs_init.h"
 
 #endif // VIEWS_H_INCLUDED

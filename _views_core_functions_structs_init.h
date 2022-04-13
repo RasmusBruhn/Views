@@ -38,6 +38,7 @@ void _VIW_InitStructChild(VIW_Child *Struct)
 void _VIW_InitStructProperty(VIW_Property *Struct)
 {
     Struct->data = NULL;
+    Struct->superData = NULL;
     Struct->order = 0;
     Struct->_type = _VIW_ID_PROPERTY_NONE;
     Struct->_updateFunc = NULL;
