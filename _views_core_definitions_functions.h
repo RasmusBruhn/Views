@@ -243,6 +243,23 @@ bool _VIW_ChangeActive(VIW_View *View, bool Active);
 // View: The view to update
 bool _VIW_UpdateActive(VIW_View *View);
 
+// Add view to a base list
+// Returns true on success and false on error
+// View: The view to add to the list
+// List: The list to add the view to
+bool _VIW_AddToBaseList(VIW_View *View, VIW_ViewList *List);
+
+// Remove view from a base list
+// View: The view to add to the list
+// List: The list to add the view to
+void _VIW_RemoveFromBaseList(VIW_View *View, VIW_ViewList *List);
+
+// Update order of a view on a base list
+// Returns true on success and false on error
+// View: The view to add to the list
+// List: The list to add the view to
+bool _VIW_UpdateOnBaseList(VIW_View *View, VIW_ViewList *List);
+
 // Initialise structs
 
 // Initializes the structure

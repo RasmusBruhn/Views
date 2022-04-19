@@ -64,14 +64,6 @@ bool _VIW_UpdateShape(VIW_View *View, bool AllowSiblingUpdate)
     OBJ_CopyRect(View->_shape.boundRect, View->_shape.rect);
     OBJ_CommonRect(View->_shape.boundRect, View->_bounds.rect);
 
-    // Update property
-    if (View->property._updateFunc != NULL)
-        if (!View->property._updateFunc(View))
-        {
-            _VIW_AddError(_VIW_ID_ERRORID_UPDATESHAPE_PROPERTY, _VIW_STRING_ERROR_UPDATEPROPERTY);
-            return false;
-        }
-
     // Update the children
     for (VIW_View **ViewList = View->_child.list.list, **EndList = ViewList + View->_child.list.count; ViewList < EndList; ++ViewList)
         if ((*ViewList)->_flags.totalActive)
@@ -105,6 +97,14 @@ bool _VIW_UpdateShape(VIW_View *View, bool AllowSiblingUpdate)
                     return false;
                 }
     }
+
+    // Update property
+    if (View->property._updateFunc != NULL)
+        if (!View->property._updateFunc(View))
+        {
+            _VIW_AddError(_VIW_ID_ERRORID_UPDATESHAPE_PROPERTY, _VIW_STRING_ERROR_UPDATEPROPERTY);
+            return false;
+        }
 
     return true;
 }
