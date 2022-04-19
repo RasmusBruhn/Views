@@ -202,8 +202,9 @@ struct __VIW_Property
     enum _VIW_ID_Property _type;              // The type of view property
     bool (*_updateFunc)(VIW_View *View);      // The function when the view has updated its shape or it is activated/deactivated
     void (*_destroyFunc)(VIW_View *View);     // The function which destroys the property
+    void (*_destroySuperFunc)(VIW_View *View);// The function to destroy the super property
     bool (*_runFunc)(VIW_View *View);         // The function to run when the view needs to do its function
-    enum _VIW_ID_PropertyType _runType;       // The type of run function that it uses (and the type the order is)
+    enum _VIW_ID_PropertyType _superType;       // The type of run function that it uses (and the type the order is)
     VIW_View *_nextBase;                      // The base up next in the hierarchy
 };
 

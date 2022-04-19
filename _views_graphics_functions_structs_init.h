@@ -9,7 +9,6 @@ void _VIW_InitStructPropertyGraphics(VIW_PropertyGraphics *Struct)
 {
     Struct->useCanvas = false;
     Struct->canvas = NULL;
-    Struct->canvasRender = NULL;
 }
 
 void _VIW_InitStructPropertyGraphicsBase(VIW_PropertyGraphicsBase *Struct)

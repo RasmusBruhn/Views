@@ -43,8 +43,9 @@ void _VIW_InitStructProperty(VIW_Property *Struct)
     Struct->_type = _VIW_ID_PROPERTY_NONE;
     Struct->_updateFunc = NULL;
     Struct->_destroyFunc = NULL;
+    Struct->_destroySuperFunc = NULL;
     Struct->_runFunc = NULL;
-    Struct->_runType = _VIW_ID_PROPERTYTYPE_NONE;
+    Struct->_superType = _VIW_ID_PROPERTYTYPE_NONE;
     Struct->_nextBase = NULL;
 }
 

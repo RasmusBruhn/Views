@@ -14,7 +14,6 @@ struct __VIW_PropertyGraphics
 {
     bool useCanvas;                 // True if it has the graphics stored in a texture
     SDL_Texture *canvas;            // The texture for the graphics of the view
-    SDL_Renderer *canvasRender;     // The renderer for the canvas
 };
 
 struct __VIW_PropertyGraphicsBase
