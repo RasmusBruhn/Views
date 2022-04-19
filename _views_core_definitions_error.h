@@ -100,7 +100,10 @@ enum _VIW_Core_ID_ErrorID
     _VIW_ID_ERRORID_UPDATEACTIVE_PROPERTY = 0x2001A0200,
     _VIW_ID_ERRORID_UPDATEACTIVE_CHILD = 0x2001A0201,
     _VIW_ID_ERRORID_CHANGEACTIVESET_UPDATE = 0x2001B0200,
-    _VIW_ID_ERRORID_CHANGEACTIVE_UPDATE = 0x2001C0200
+    _VIW_ID_ERRORID_CHANGEACTIVE_UPDATE = 0x2001C0200,
+    _VIW_ID_ERRORID_ADDTOBASELIST_ADD = 0x2001D0200,
+    _VIW_ID_ERRORID_REMOVEFROMBASELIST = 0x2001E0200,
+    _VIW_ID_ERRORID_UPDATEONBASELIST_EXIST = 0x2001F0200
 };
 
 // Error messages
@@ -140,6 +143,7 @@ enum _VIW_Core_ID_ErrorID
 // Invalid errors
 #define _VIW_STRING_ERROR_FIRSTCHILD "Reference to earlier sibling is invalid because this is the first child"
 #define _VIW_STRING_ERROR_DATAINITIALIZED "Data is already initialized"
+#define _VIW_STRING_ERROR_NOTEXISTINLIST "This element does not exist in the specified list"
 
 // Create error
 #define _VIW_STRING_ERROR_MALLOC "Unable to allocate memory"

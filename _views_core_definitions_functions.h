@@ -247,18 +247,19 @@ bool _VIW_UpdateActive(VIW_View *View);
 // Returns true on success and false on error
 // View: The view to add to the list
 // List: The list to add the view to
-bool _VIW_AddToBaseList(VIW_View *View, VIW_ViewList *List);
+bool _VIW_AddToBaseList(VIW_ViewList *List, VIW_View *View);
 
 // Remove view from a base list
+// Returns true on success and false on error
 // View: The view to add to the list
 // List: The list to add the view to
-void _VIW_RemoveFromBaseList(VIW_View *View, VIW_ViewList *List);
+bool _VIW_RemoveFromBaseList(VIW_ViewList *List, VIW_View *View);
 
 // Update order of a view on a base list
 // Returns true on success and false on error
 // View: The view to add to the list
 // List: The list to add the view to
-bool _VIW_UpdateOnBaseList(VIW_View *View, VIW_ViewList *List);
+bool _VIW_UpdateOnBaseList(VIW_ViewList *List, VIW_View *View);
 
 // Initialise structs
 

@@ -559,6 +559,75 @@ bool _VIW_ChangeActive(VIW_View *View, bool Active)
     return true;
 }
 
+bool _VIW_AddToBaseList(VIW_ViewList *List, VIW_View *View)
+{
+    // Find the place for the new view
+    VIW_View **Start = List->list;
+    VIW_View **End = Start + List->count - 1;
+    VIW_View **Middle = NULL;
+
+    // Loop until it is narrowed down
+    while (Start < End - 1)
+    {
+        Middle = Start + ((size_t)(End - Start) / 2);
+
+        if (View->property.order < (*Middle)->property.order)
+            End = Middle;
+
+        else
+            Start = Middle;
+    }
+
+    // Add in the new view
+    if (!_VIW_AddToViewListWithPos(List, View, End))
+    {
+        _VIW_AddError(_VIW_ID_ERRORID_ADDTOBASELIST_ADD, _VIW_STRING_ERROR_ADDTOLIST);
+        return false;
+    }
+
+    return true;
+}
+
+bool _VIW_RemoveFromBaseList(VIW_ViewList *List, VIW_View *View)
+{
+    if (!_VIW_RemoveFromViewList(List, View))
+    {
+        _VIW_AddError(_VIW_ID_ERRORID_REMOVEFROMBASELIST, _VIW_STRING_ERROR_REMOVEFROMLIST);
+        return false;
+    }
+
+    return true;
+}
+
+bool _VIW_UpdateOnBaseList(VIW_ViewList *List, VIW_View *View)
+{
+    // Find the current position for the view
+    VIW_View **Current = List->list;
+
+    for (VIW_View **EndList = Current + List->count; Current < EndList; ++Current)
+        if (*Current == View)
+            break;
+
+    // Error if it did not find it
+    if (Current == List->list + List->count)
+    {
+        _VIW_SetError(_VIW_ID_ERRORID_UPDATEONBASELIST_EXIST, _VIW_STRING_ERROR_NOTEXISTINLIST);
+        return false;
+    }
+
+    // Move it backwards
+    for (VIW_View **StartList = List->list; (Current > StartList) && ((*(Current - 1))->property.order > View->property.order); --Current)
+        *Current = *(Current - 1);
+
+    // Move it forwards
+    for (VIW_View **EndList = List->list + List->count - 1; (Current < EndList) && ((*(Current + 1))->property.order < View->property.order); ++Current)
+        *Current = *(Current + 1);
+
+    *Current = View;
+
+    return true;
+}
+
 /*
 VIW_View *VIW_CreateScriptView(VIW_View *Parent, uint64_t Time, uint64_t Increase, uint32_t Order)
 {
