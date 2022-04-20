@@ -181,7 +181,7 @@ struct __VIW_Window
 // Flags, all flags for the view which can be changed by user
 struct __VIW_Flags
 {
-    bool active : 1;         // If false then the view won't be updated or visible by other views
+    bool _active : 1;         // If false then the view won't be updated or visible by other views
 };
 
 // Set flags, all flags for the view which should not be changed
@@ -198,13 +198,14 @@ struct __VIW_Property
 {
     void *data;                               // The property data
     void *superData;                          // The data for the super type, like graphics
-    int32_t order;                            // The order in which it should use the run function, lowest order view runs first
+    int32_t _order;                           // The order in which it should use the run function, lowest order view runs first
     enum _VIW_ID_Property _type;              // The type of view property
     bool (*_updateFunc)(VIW_View *View);      // The function when the view has updated its shape or it is activated/deactivated
+    bool (*_updateSuperFunc)(VIW_View *View); // The function when the view has updated its shape or it is activated/deactivated
     void (*_destroyFunc)(VIW_View *View);     // The function which destroys the property
     void (*_destroySuperFunc)(VIW_View *View);// The function to destroy the super property
     bool (*_runFunc)(VIW_View *View);         // The function to run when the view needs to do its function
-    enum _VIW_ID_PropertyType _superType;       // The type of run function that it uses (and the type the order is)
+    enum _VIW_ID_PropertyType _superType;     // The type of run function that it uses (and the type the order is)
     VIW_View *_nextBase;                      // The base up next in the hierarchy
 };
 

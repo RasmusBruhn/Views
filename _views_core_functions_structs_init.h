@@ -39,9 +39,10 @@ void _VIW_InitStructProperty(VIW_Property *Struct)
 {
     Struct->data = NULL;
     Struct->superData = NULL;
-    Struct->order = 0;
+    Struct->_order = 0;
     Struct->_type = _VIW_ID_PROPERTY_NONE;
     Struct->_updateFunc = NULL;
+    Struct->_updateSuperFunc = NULL;
     Struct->_destroyFunc = NULL;
     Struct->_destroySuperFunc = NULL;
     Struct->_runFunc = NULL;
@@ -59,7 +60,7 @@ void _VIW_InitStructFlagsSet(VIW_FlagsSet *Struct)
 
 void _VIW_InitStructFlags(VIW_Flags *Struct)
 {
-    Struct->active = true;
+    Struct->_active = true;
 }
 
 void _VIW_InitStructWindow(VIW_Window *Struct)

@@ -4,6 +4,12 @@
 
 #include "Views.h"
 
+// Allocate memory and initialise
+// Set root to be itself
+// Set window data
+// Set shape to be Window
+// Add to root list
+// Add a base property
 VIW_View *VIW_CreateRoot(SDL_Window *Window, SDL_Renderer *Renderer)
 {
     // Create the new view
@@ -59,6 +65,8 @@ VIW_View *VIW_CreateRoot(SDL_Window *Window, SDL_Renderer *Renderer)
     return Root;
 }
 
+// Remove from root list
+// Destroy root struct
 void VIW_DestroyRoot(VIW_View *Root)
 {
     extern VIW_ViewList _VIW_RootList;
@@ -70,6 +78,14 @@ void VIW_DestroyRoot(VIW_View *Root)
     VIW_DestroyView(Root);
 }
 
+// Allocate memory and initialise
+// Find the base of the view
+// Copy window data from parent
+// Add to list of children of parent
+// Fix the ChildPos for later children
+// Set update priorities
+// Set parent data
+// Set active data to be the same as parent
 VIW_View *VIW_CreateViewWithPos(VIW_View *Parent, uint32_t ChildPos)
 {
     // Get memory for the view
@@ -128,8 +144,20 @@ VIW_View *VIW_CreateViewWithPos(VIW_View *Parent, uint32_t ChildPos)
     return View;
 }
 
+// Destroy all the children
+// Destroy the property
+// Destroy the shape data
+// Remove it from parents child list and update child pos for other children
+// Free memory 
 void VIW_DestroyView(VIW_View *View)
 {
+    // Destroy the children
+    for (VIW_View **EndList = View->_child.list.list, **ViewList = EndList + View->_child.list.count; ViewList > EndList;)
+        VIW_DestroyView(*(--ViewList));
+
+    if (View->_child.list.list != NULL)
+        free(View->_child.list.list);
+
     // Destroy the property
     if (View->property._destroyFunc != NULL)
         View->property._destroyFunc(View);
@@ -137,13 +165,6 @@ void VIW_DestroyView(VIW_View *View)
     // Destroy the shape data
     if (View->shapeData.type == VIW_ID_SHAPE_ADVANCED && View->shapeData.data.data != NULL)
         free(View->shapeData.data.data);
-
-    // Destroy the children
-    for (VIW_View **EndList = View->_child.list.list, **ViewList = EndList + View->_child.list.count; ViewList > EndList;)
-        VIW_DestroyView(*(--ViewList));
-
-    if (View->_child.list.list != NULL)
-        free(View->_child.list.list);
 
     // Remove it from the child list
     if (View->_parent.parent != NULL)
@@ -162,6 +183,8 @@ void VIW_DestroyView(VIW_View *View)
     free(View);
 }
 
+// Remove all roots
+// Clear all errors
 void VIW_Quit(void)
 {
     // Go through all roots and remove them
@@ -174,6 +197,8 @@ void VIW_Quit(void)
     VIW_ClearArchive();
 }
 
+// Create view
+// Set shape to copy parents
 VIW_View *VIW_CreateSubView(VIW_View *Parent)
 {
     // Create the view
@@ -192,6 +217,8 @@ VIW_View *VIW_CreateSubView(VIW_View *Parent)
     return View;
 }
 
+// Create views
+// Add the base property
 VIW_View *VIW_CreateBaseView(VIW_View *Parent)
 {
     // Create view
@@ -214,6 +241,9 @@ VIW_View *VIW_CreateBaseView(VIW_View *Parent)
     return View;
 }
 
+// Check that it is not already initialised
+// Allocate memory and initialise
+// Set shape type to advanced
 bool VIW_UseAdvancedShapeData(VIW_View *View)
 {
     // Check if it is already initialized
@@ -241,6 +271,9 @@ bool VIW_UseAdvancedShapeData(VIW_View *View)
     return true;
 }
 
+// If sibling: Check that it is not the first child and set update order
+// If ID: Check that the ID is valid and set ID
+// Set ref type
 bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, VIW_View *ID)
 {
     Ref->ref = NULL;
@@ -306,6 +339,11 @@ bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, V
     return true;
 }
 
+// Give warning if there are children
+// Allocate memory and initialise
+// Allocate memory for list of controlers and initialise
+// Set the property data
+// Create controler views and add them to the list
 bool VIW_CreatePropertyBase(VIW_View *View)
 {
     // Give warning if there are any children
@@ -324,6 +362,7 @@ bool VIW_CreatePropertyBase(VIW_View *View)
     // Initialize
     _VIW_InitStructPropertyBase(Property);
 
+    // Add memory for controler lists
     extern VIW_View *(**_VIW_BaseFuncList)(VIW_View * BaseView);
     extern size_t _VIW_BaseFuncCount;
     
@@ -386,6 +425,8 @@ bool VIW_CreatePropertyBase(VIW_View *View)
     }
 }*/
 
+// Free list of controlers
+// Free memory
 void _VIW_DestroyPropertyBase(VIW_View *View)
 { 
     // Free the list
@@ -395,6 +436,8 @@ void _VIW_DestroyPropertyBase(VIW_View *View)
     free(View->property.data);
 }
 
+// Allocate more memory
+// Add element to the correct position while moving other elements to make room
 void *_VIW_AddToListWithPos(void **List, uint32_t Length, void *Object, uint32_t Pos)
 {
     // Make sure Pos is within the list
@@ -423,6 +466,9 @@ void *_VIW_AddToListWithPos(void **List, uint32_t Length, void *Object, uint32_t
     return NewList;
 }
 
+// Find the element
+// Remove the element
+// Shorten the list
 void *_VIW_RemoveFromList(void **List, uint32_t Length, void *Object)
 {
     // Find object in the list
@@ -455,6 +501,8 @@ void *_VIW_RemoveFromList(void **List, uint32_t Length, void *Object)
     return NewList;
 }
 
+// Add element to the list
+// Update the count
 bool _VIW_AddToViewListWithPos(VIW_ViewList *List, VIW_View *View, uint32_t Pos)
 {
     // Add view to list
@@ -475,6 +523,8 @@ bool _VIW_AddToViewListWithPos(VIW_ViewList *List, VIW_View *View, uint32_t Pos)
     return true;
 }
 
+// Remove object
+// Update the count
 bool _VIW_RemoveFromViewList(VIW_ViewList *List, VIW_View *View)
 {
     // Remove object
@@ -500,10 +550,12 @@ bool _VIW_RemoveFromViewList(VIW_ViewList *List, VIW_View *View)
     return true;
 }
 
+// Update active status
+// Update total active status
 bool VIW_ChangeActive(VIW_View *View, bool Active)
 {
     // Change the active status
-    View->flags.active = Active;
+    View->flags._active = Active;
 
     // Update the total active
     if (!_VIW_UpdateActive(View))
@@ -515,16 +567,28 @@ bool VIW_ChangeActive(VIW_View *View, bool Active)
     return true;
 }
 
+// Update the total active
+// If it changed:
+// - Update active status for children
+// - Update property
 bool _VIW_UpdateActive(VIW_View *View)
 {
     // Update the total active
     bool PrevActive = View->_flags.totalActive;
 
-    View->_flags.totalActive = View->flags.active & View->_flags.active;
+    View->_flags.totalActive = View->flags._active & View->_flags.active;
 
     // If it changed update property and all children
     if (PrevActive != View->_flags.totalActive)
     {
+        // Update the children
+        for (VIW_View **ViewList = View->_child.list.list, **EndList = View->_child.list.list + View->_child.list.count; ViewList < EndList; ++ViewList)
+            if (!_VIW_ChangeActive(*ViewList, View->_flags.totalActive))
+            {
+                _VIW_AddError(_VIW_ID_ERRORID_UPDATEACTIVE_CHILD, _VIW_STRING_ERROR_UPDATECHILD);
+                return false;
+            }
+
         // Update property
         if (View->property._updateFunc != NULL)
             if (!View->property._updateFunc(View))
@@ -533,11 +597,10 @@ bool _VIW_UpdateActive(VIW_View *View)
                 return false;
             }
 
-        // Update the children
-        for (VIW_View **ViewList = View->_child.list.list, **EndList = View->_child.list.list + View->_child.list.count; ViewList < EndList; ++ViewList)
-            if (!_VIW_ChangeActive(*ViewList, View->_flags.totalActive))
+        if (View->property._updateSuperFunc != NULL)
+            if (!View->property._updateSuperFunc(View))
             {
-                _VIW_AddError(_VIW_ID_ERRORID_UPDATEACTIVE_CHILD, _VIW_STRING_ERROR_UPDATECHILD);
+                _VIW_AddError(_VIW_ID_ERRORID_UPDATEACTIVE_SUPERPROPERTY, _VIW_STRING_ERROR_UPDATEPROPERTY);
                 return false;
             }
     }
@@ -545,6 +608,8 @@ bool _VIW_UpdateActive(VIW_View *View)
     return true;
 }
 
+// Set the internal active status
+// Update the total active status
 bool _VIW_ChangeActive(VIW_View *View, bool Active)
 {
     // Change the active status
@@ -560,6 +625,8 @@ bool _VIW_ChangeActive(VIW_View *View, bool Active)
     return true;
 }
 
+// Find position for the new view
+// Add to the list
 bool _VIW_AddToBaseList(VIW_ViewList *List, VIW_View *View)
 {
     // Find the place for the new view
@@ -572,7 +639,7 @@ bool _VIW_AddToBaseList(VIW_ViewList *List, VIW_View *View)
     {
         Middle = Start + ((size_t)(End - Start) / 2);
 
-        if (View->property.order < (*Middle)->property.order)
+        if (View->property._order < (*Middle)->property._order)
             End = Middle;
 
         else
@@ -589,6 +656,7 @@ bool _VIW_AddToBaseList(VIW_ViewList *List, VIW_View *View)
     return true;
 }
 
+// Remove element from the list
 bool _VIW_RemoveFromBaseList(VIW_ViewList *List, VIW_View *View)
 {
     if (!_VIW_RemoveFromViewList(List, View))
@@ -600,6 +668,8 @@ bool _VIW_RemoveFromBaseList(VIW_ViewList *List, VIW_View *View)
     return true;
 }
 
+// Find the element in the list
+// Move it to the correct position
 bool _VIW_UpdateOnBaseList(VIW_ViewList *List, VIW_View *View)
 {
     // Find the current position for the view
@@ -617,11 +687,11 @@ bool _VIW_UpdateOnBaseList(VIW_ViewList *List, VIW_View *View)
     }
 
     // Move it backwards
-    for (VIW_View **StartList = List->list; (Current > StartList) && ((*(Current - 1))->property.order > View->property.order); --Current)
+    for (VIW_View **StartList = List->list; (Current > StartList) && ((*(Current - 1))->property._order > View->property._order); --Current)
         *Current = *(Current - 1);
 
     // Move it forwards
-    for (VIW_View **EndList = List->list + List->count - 1; (Current < EndList) && ((*(Current + 1))->property.order < View->property.order); ++Current)
+    for (VIW_View **EndList = List->list + List->count - 1; (Current < EndList) && ((*(Current + 1))->property._order < View->property._order); ++Current)
         *Current = *(Current + 1);
 
     *Current = View;

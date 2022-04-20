@@ -106,6 +106,13 @@ bool _VIW_UpdateShape(VIW_View *View, bool AllowSiblingUpdate)
             return false;
         }
 
+    if (View->property._updateSuperFunc != NULL)
+        if (!View->property._updateSuperFunc(View))
+        {
+            _VIW_AddError(_VIW_ID_ERRORID_UPDATESHAPE_SUPERPROPERTY, _VIW_STRING_ERROR_UPDATEPROPERTY);
+            return false;
+        }
+
     return true;
 }
 
