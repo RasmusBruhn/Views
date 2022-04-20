@@ -106,7 +106,9 @@ enum _VIW_Core_ID_ErrorID
     _VIW_ID_ERRORID_CHANGEACTIVE_UPDATE = 0x2001C0200,
     _VIW_ID_ERRORID_ADDTOBASELIST_ADD = 0x2001D0200,
     _VIW_ID_ERRORID_REMOVEFROMBASELIST = 0x2001E0200,
-    _VIW_ID_ERRORID_UPDATEONBASELIST_EXIST = 0x2001F0200
+    _VIW_ID_ERRORID_UPDATEONBASELIST_EXIST = 0x2001F0200,
+    _VIW_ID_ERRORID_UPDATEORDER_LIST = 0x200200200,
+    _VIW_ID_ERRORID_UPDATEORDER_UPDATE = 0x200200201
 };
 
 // Error messages
@@ -129,6 +131,7 @@ enum _VIW_Core_ID_ErrorID
 #define _VIW_STRING_ERROR_SETSHAPEORIGIN "Unable to set shape using \"Origin\" method"
 #define _VIW_STRING_ERROR_UPDATETIME "Unable to update time"
 #define _VIW_STRING_ERROR_UPDATEACTIVE "Unable to update the total active status"
+#define _VIW_STRING_ERROR_UPDATELIST "Unable to update the list"
 
 // Window errors
 #define _VIW_ID_STRING_WINDOWID "Unable to get the window ID"
@@ -137,6 +140,7 @@ enum _VIW_Core_ID_ErrorID
 #define _VIW_STRING_ERROR_NOREF "Unable to find reference view"
 #define _VIW_STRING_ERROR_SHAPEDATA "No shape data is available"
 #define _VIW_STRING_ERROR_NOPOINTER "No pointer has not been specified"
+#define _VIW_STRING_ERROR_NULLLIST "The list has not been specified"
 
 // Calculation error
 #define _VIW_STRING_ERROR_CALCPOS "Unable to calculate the position"

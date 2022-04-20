@@ -40,6 +40,7 @@ void _VIW_InitStructProperty(VIW_Property *Struct)
     Struct->data = NULL;
     Struct->superData = NULL;
     Struct->_order = 0;
+    Struct->_orderList = NULL;
     Struct->_type = _VIW_ID_PROPERTY_NONE;
     Struct->_updateFunc = NULL;
     Struct->_updateSuperFunc = NULL;

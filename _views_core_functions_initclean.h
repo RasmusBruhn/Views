@@ -404,6 +404,9 @@ bool VIW_CreatePropertyBase(VIW_View *View)
             return false;
         }
 
+        // Set the correct base
+        NewView->property._nextBase = View->property._nextBase;
+
         // Add to the list
         Property->_list.list[Count] = NewView;
     }
@@ -699,8 +702,32 @@ bool _VIW_UpdateOnBaseList(VIW_ViewList *List, VIW_View *View)
     return true;
 }
 
-/*
-VIW_View *VIW_CreateScriptView(VIW_View *Parent, uint64_t Time, uint64_t Increase, uint32_t Order)
+// Check that the list exists
+// Set the new order value
+// Update the position in the list
+bool VIW_UpdateOrder(VIW_View *View, int32_t Order)
+{
+    // Make sure there is a list
+    if (View->property._orderList == NULL)
+    {
+        _VIW_SetError(_VIW_ID_ERRORID_UPDATEORDER_LIST, _VIW_STRING_ERROR_NULLLIST);
+        return false;
+    }
+
+    // Set the new order value
+    View->property._order = Order;
+
+    // Update the position
+    if (!_VIW_UpdateOnBaseList(View->property._orderList, View))
+    {
+        _VIW_AddError(_VIW_ID_ERRORID_UPDATEORDER_UPDATE, _VIW_STRING_ERROR_UPDATELIST);
+        return false;
+    }
+
+    return true;
+}
+
+/* VIW_View *VIW_CreateScriptView(VIW_View *Parent, uint64_t Time, uint64_t Increase, uint32_t Order)
 {
     DBG_SessionStart("VIW_CreateScriptView");
 

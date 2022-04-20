@@ -199,6 +199,7 @@ struct __VIW_Property
     void *data;                               // The property data
     void *superData;                          // The data for the super type, like graphics
     int32_t _order;                           // The order in which it should use the run function, lowest order view runs first
+    VIW_ViewList *_orderList;                 // The list in which this view is ordered
     enum _VIW_ID_Property _type;              // The type of view property
     bool (*_updateFunc)(VIW_View *View);      // The function when the view has updated its shape or it is activated/deactivated
     bool (*_updateSuperFunc)(VIW_View *View); // The function when the view has updated its shape or it is activated/deactivated

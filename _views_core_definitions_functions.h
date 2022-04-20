@@ -70,6 +70,12 @@ bool VIW_CreatePropertyBase(VIW_View *View);
 // Active: What the ative status should be updated to
 bool VIW_ChangeActive(VIW_View *View, bool Active);
 
+// Sets the new order for a view
+// Returns true on success and false on error
+// View: The view to update the order for
+// Order: The new order of the view
+bool VIW_UpdateOrder(VIW_View *View, int32_t Order);
+
 // Internal functions
 
 // Set shape
