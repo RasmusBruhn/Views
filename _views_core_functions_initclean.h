@@ -308,6 +308,10 @@ bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, V
 
 bool VIW_CreatePropertyBase(VIW_View *View)
 {
+    // Give warning if there are any children
+    if (View->_child.list.count > 0)
+        _VIW_SetError(_VIW_ID_ERRORID_CREATEPROPERTYBASE_CHILDREN, _VIW_STRING_ERROR_PROPERTYCHILDREN);
+
     // Get memory for property
     VIW_PropertyBase *Property = (VIW_PropertyBase *)malloc(sizeof(VIW_PropertyBase));
 
@@ -365,13 +369,10 @@ bool VIW_CreatePropertyBase(VIW_View *View)
         Property->_list.list[Count] = NewView;
     }
         
-    // Update children that needs a new base view
-    _VIW_UpdateNextBase(View, View);
-
     return true;
 }
 
-void _VIW_UpdateNextBase(VIW_View *View, VIW_View *Base)
+/*void _VIW_UpdateNextBase(VIW_View *View, VIW_View *Base)
 {
     // Go through all of the children
     for (VIW_View **ViewList = View->_child.list.list, **EndList = View->_child.list.list + View->_child.list.count; ViewList < EndList; ++ViewList)
@@ -383,7 +384,7 @@ void _VIW_UpdateNextBase(VIW_View *View, VIW_View *Base)
         if ((*ViewList)->property._type != _VIW_ID_PROPERTY_BASE)
             _VIW_UpdateNextBase(*ViewList, Base);
     }
-}
+}*/
 
 void _VIW_DestroyPropertyBase(VIW_View *View)
 { 
