@@ -76,6 +76,10 @@ bool VIW_ChangeActive(VIW_View *View, bool Active);
 // Order: The new order of the view
 bool VIW_UpdateOrder(VIW_View *View, int32_t Order);
 
+// Forces all views to update
+// Returns true on success and false on error
+bool VIW_ForceUpdate(void);
+
 // Internal functions
 
 // Set shape
@@ -266,6 +270,11 @@ bool _VIW_RemoveFromBaseList(VIW_ViewList *List, VIW_View *View);
 // View: The view to add to the list
 // List: The list to add the view to
 bool _VIW_UpdateOnBaseList(VIW_ViewList *List, VIW_View *View);
+
+// Force updates a view and all its children
+// Returns true on success and false on error
+// View: The view to update
+bool _VIW_ForceUpdate(VIW_View *View);
 
 // Initialise structs
 

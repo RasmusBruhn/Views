@@ -108,7 +108,8 @@ enum _VIW_Core_ID_ErrorID
     _VIW_ID_ERRORID_REMOVEFROMBASELIST = 0x2001E0200,
     _VIW_ID_ERRORID_UPDATEONBASELIST_EXIST = 0x2001F0200,
     _VIW_ID_ERRORID_UPDATEORDER_LIST = 0x200200200,
-    _VIW_ID_ERRORID_UPDATEORDER_UPDATE = 0x200200201
+    _VIW_ID_ERRORID_UPDATEORDER_UPDATE = 0x200200201,
+    _VIW_ID_ERRORID_FORCEUPDATEINT_UPDATE = 0x200210200
 };
 
 // Error messages
@@ -132,6 +133,7 @@ enum _VIW_Core_ID_ErrorID
 #define _VIW_STRING_ERROR_UPDATETIME "Unable to update time"
 #define _VIW_STRING_ERROR_UPDATEACTIVE "Unable to update the total active status"
 #define _VIW_STRING_ERROR_UPDATELIST "Unable to update the list"
+#define _VIW_STRING_ERROR_UPDATE "Unable to update view"
 
 // Window errors
 #define _VIW_ID_STRING_WINDOWID "Unable to get the window ID"

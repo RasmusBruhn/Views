@@ -18,13 +18,13 @@ bool _VIW_CreateCanvas(VIW_View *View)
     // Check that it does not already have a canvas
     VIW_PropertyGraphics *SuperData = (VIW_PropertyGraphics *)View->property.superData;
 
-    if (SuperData->useCanvas)
+    if (SuperData->_useCanvas)
     {
         _VIW_SetError(_VIW_ID_ERRORID_CREATECANVAS_INIT, _VIW_STRING_ERROR_ALREADYINIT);
         return _VIW_UpdateCanvas(View);
     }
 
-    // Create the texture
+    // Create the texture if it is active
     SDL_Texture *Canvas = SDL_CreateTexture(View->_window.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, View->_shape.rect.w, View->_shape.rect.h);
 
     if (Canvas == NULL)
@@ -34,8 +34,8 @@ bool _VIW_CreateCanvas(VIW_View *View)
     }
 
     // Set values
-    SuperData->canvas = Canvas;
-    SuperData->useCanvas = true;
+    SuperData->_canvas = Canvas;
+    SuperData->_useCanvas = true;
 
     return true;
 }
@@ -52,7 +52,7 @@ bool _VIW_UpdateCanvas(VIW_View *View)
     // Check that it does already have a canvas
     VIW_PropertyGraphics *SuperData = (VIW_PropertyGraphics *)View->property.superData;
 
-    if (!SuperData->useCanvas)
+    if (!SuperData->_useCanvas)
     {
         _VIW_SetError(_VIW_ID_ERRORID_UPDATECANVAS_INIT, _VIW_STRING_ERROR_NOTINIT);
         return _VIW_UpdateCanvas(View);
@@ -68,10 +68,10 @@ bool _VIW_UpdateCanvas(VIW_View *View)
     }
 
     // Destroy the old canvas
-    SDL_DestroyTexture(SuperData->canvas);
+    SDL_DestroyTexture(SuperData->_canvas);
 
     // Insert the new canvas
-    SuperData->canvas = Canvas;
+    SuperData->_canvas = Canvas;
 
     return true;
 }
@@ -88,16 +88,16 @@ void _VIW_DestroyCanvas(VIW_View *View)
     // Check that it has a canvas
     VIW_PropertyGraphics *SuperData = (VIW_PropertyGraphics *)View->property.superData;
 
-    if (SuperData->canvas != NULL)
+    if (SuperData->_canvas != NULL)
     {
         _VIW_SetError(_VIW_ID_ERRORID_DESTROYCANVAS_INIT, _VIW_STRING_ERROR_NOTINIT);
         return;
     }
 
     // Destroy it
-    SDL_DestroyTexture(SuperData->canvas);
-    SuperData->canvas = NULL;
-    SuperData->useCanvas = false;
+    SDL_DestroyTexture(SuperData->_canvas);
+    SuperData->_canvas = NULL;
+    SuperData->_useCanvas = false;
 }
 
 #endif // VIEWS_GRAPHICS_FUNCTIONS_FUNCTIONS
