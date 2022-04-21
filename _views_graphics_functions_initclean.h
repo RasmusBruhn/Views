@@ -57,6 +57,10 @@ void _VIW_DestroyCanvas(VIW_View *View)
     SDL_DestroyTexture(SuperData->_canvas);
 }
 
+// Allocate memory
+// Add to graphics base list
+// Set property data
+// Set functions
 bool _VIW_CreatePropertyGraphics(VIW_View *View)
 {
     // Allocate memory
@@ -68,22 +72,35 @@ bool _VIW_CreatePropertyGraphics(VIW_View *View)
         return false;
     }
 
+    _VIW_InitStructPropertyGraphics(Property);
+
     // Add to list in next base
-    View->property.
+    VIW_ViewList *BaseList = &((VIW_PropertyGraphicsBase *)((VIW_PropertyBase *)View->property._nextBase->property.data)->_list.list[_VIW_ID_PROPERTYTYPEPOS_GRAPHICS]->property.data)->_list;
+    
+    if (!_VIW_AddToBaseList(BaseList, View))
+    {
+        free(Property);
+        _VIW_AddError(_VIW_ID_ERRORID_CREATEPROPERTYGRAPHICS_BASLIST, _VIW_STRING_ERROR_ADDTOLIST);
+        return false;
+    }
+
+    View->property._orderList = BaseList;
 
     // Set property
     View->property.superData = Property;
     View->property._superType = _VIW_ID_PROPERTYTYPE_GRAPHICS;
-    
+
     // Set functions
     View->property._destroySuperFunc = _VIW_DestroyPropertyGraphics;
     View->property._updateSuperFunc = _VIW_UpdatePropertyGraphics;
     View->property._runSuperFunc = _VIW_RunPropertyGraphics;
+
+    return true;
 }
 
 void _VIW_DestroyPropertyGraphics(VIW_View *View)
 {
-
+    
 }
 
 bool _VIW_RunPropertyGraphics(VIW_View *View)

@@ -407,9 +407,6 @@ bool VIW_CreatePropertyBase(VIW_View *View)
             return false;
         }
 
-        // Set the correct base
-        NewView->property._nextBase = View->property._nextBase;
-
         // Add to the list
         Property->_list.list[Count] = NewView;
     }
