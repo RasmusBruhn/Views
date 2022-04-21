@@ -90,6 +90,7 @@ enum _VIW_Core_ID_ErrorID
     _VIW_ID_ERRORID_USEADVANCEDSHAPEDATA_MALLOC = 0x200130200,
     _VIW_ID_ERRORID_USEADVANCEDSHAPEDATA_INIT = 0x200130101,
     _VIW_ID_ERRORID_UPDATESHAPECOPY_REF = 0x200140200,
+    _VIW_ID_ERRORID_UPDATESHAPECOPY_BASE = 0x200140201,
     _VIW_ID_ERRORID_ADDTOLIST_POS = 0x200150200,
     _VIW_ID_ERRORID_ADDTOLIST_REALLOC = 0x200150301,
     _VIW_ID_ERRORID_REMOVEFROMLIST_LOCATE = 0x200160100,
@@ -153,6 +154,7 @@ enum _VIW_Core_ID_ErrorID
 #define _VIW_STRING_ERROR_FIRSTCHILD "Reference to earlier sibling is invalid because this is the first child"
 #define _VIW_STRING_ERROR_DATAINITIALIZED "Data is already initialized"
 #define _VIW_STRING_ERROR_NOTEXISTINLIST "This element does not exist in the specified list"
+#define _VIW_STRING_ERROR_SAMEBASE "Unable to copy shape since target must have the same base or be the base"
 
 // Create error
 #define _VIW_STRING_ERROR_MALLOC "Unable to allocate memory"

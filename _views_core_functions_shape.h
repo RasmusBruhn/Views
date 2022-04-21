@@ -127,8 +127,23 @@ bool _VIW_UpdateShapeCopy(VIW_View *View)
         return false;
     }
 
+    // Make sure they have the same base
+    if (Ref->property._nextBase != View->property._nextBase && Ref != View->property._nextBase)
+    {
+        _VIW_SetError(_VIW_ID_ERRORID_UPDATESHAPECOPY_BASE, _VIW_STRING_ERROR_SAMEBASE);
+        return false;
+    }
+
     // Copy the shape of the reference
-    OBJ_CopyRect(View->_shape.rect, Ref->_shape.rect);
+    if (View->property._nextBase == Ref)
+    {
+        OBJ_SetRect(View->_shape.rect, 0, 0, Ref->_shape.rect.w, Ref->_shape.rect.h);
+    }
+
+    else
+    {
+        OBJ_CopyRect(View->_shape.rect, Ref->_shape.rect);
+    }
 
     return true;
 }
@@ -139,7 +154,7 @@ bool _VIW_UpdateShapeWindow(VIW_View *View)
     OBJ_SetPoint(View->_shape.rect, 0, 0);
 
     // Get window shape
-    SDL_GetWindowSize(View->_window.window, &View->_shape.rect.x, &View->_shape.rect.y);
+    SDL_GetWindowSize(View->_window.window, &View->_shape.rect.w, &View->_shape.rect.h);
 
     return true;
 }

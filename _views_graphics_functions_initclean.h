@@ -98,14 +98,76 @@ bool _VIW_CreatePropertyGraphics(VIW_View *View)
     return true;
 }
 
+// Remove from base list
+// Free canvas
+// Reset property values
 void _VIW_DestroyPropertyGraphics(VIW_View *View)
 {
+    // Remove it from the base list
+    if (!_VIW_RemoveFromBaseList(View->property._orderList, View))
+        _VIW_AddError(_VIW_ID_ERRORID_DESTROYPROPERTYGRAPHICS_LIST, _VIW_STRING_ERROR_REMOVEFROMLIST);
+
+    // Destroy the canvas
+    VIW_PropertyGraphics *Property = (VIW_PropertyGraphics *)View->property.superData;
     
+    if (Property->_canvas != NULL)
+        SDL_DestroyTexture(Property->_canvas);
+
+    // Free the property
+    free(Property);
+
+    // Reset values
+    View->property.superData = NULL;
+    View->property._destroySuperFunc = NULL;
+    View->property._orderList = NULL;
+    View->property._runSuperFunc = NULL;
+    View->property._superType = _VIW_ID_PROPERTYTYPE_NONE;
+    View->property._updateSuperFunc = NULL;
 }
 
+// Render canvas if available
+// Render directly otherwise
 bool _VIW_RunPropertyGraphics(VIW_View *View)
 {
+    // Copy canvas onto the renderer if it exists
+    VIW_PropertyGraphics *Property = (VIW_PropertyGraphics *)View->property.superData;
 
+    if (Property->_canvas != NULL)
+    {
+        // Get rect to copy from
+        SDL_Rect Src;
+        
+        Src.x = View->_shape.boundRect.x - View->_shape.rect.x;
+        Src.y = View->_shape.boundRect.y - View->_shape.rect.y;
+        Src.w = View->_shape.boundRect.w;
+        Src.h = View->_shape.boundRect.h;
+
+        // Copy canvas
+        if (SDL_RenderCopy(View->_window.renderer, Property->_canvas, &Src, &View->_shape.boundRect) != 0)
+        {
+            _VIW_AddErrorForeign(_VIW_ID_ERRORID_RUNPROPERTYGRAPHICS_COPY, SDL_GetError(), _VIW_STRING_ERROR_COPYTEXTURE);
+            return false;
+        }
+    }
+
+    // Draw without canvas
+    else
+    {
+        // Check that a run function has been specified
+        if (View->property._runFunc == NULL)
+        {
+            _VIW_SetError(_VIW_ID_ERRORID_RUNPROPERTYGRAPHICS_RUNEXIST, _VIW_STRING_ERROR_NULLFUNCTION);
+            return true;
+        }
+
+        // Draw
+        if (!View->property._runFunc(View))
+        {
+            _VIW_AddError(_VIW_ID_ERRORID_RUNPROPERTYGRAPHICS_RUN, _VIW_STRING_ERROR_RENDER);
+        }
+    }
+
+    return true;
 }
 
 bool _VIW_UpdatePropertyGraphics(VIW_View *View)
