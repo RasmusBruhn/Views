@@ -80,6 +80,12 @@ enum _VIW_ID_PropertyType
     _VIW_ID_PROPERTYTYPE_SCRIPT
 };
 
+// Positions of base subtype views
+enum _VIW_ID_PropertyTypePos
+{
+    _VIW_ID_PROPERTYTYPEPOS_GRAPHICS = 0
+};
+
 // Return values for error
 #define VIW_ID_RETURNERROR_POINTER (NULL)
 #define VIW_ID_RETURNERROR_INT32_T (-2147483648)

@@ -162,6 +162,9 @@ void VIW_DestroyView(VIW_View *View)
     if (View->property._destroyFunc != NULL)
         View->property._destroyFunc(View);
 
+    if (View->property._destroySuperFunc != NULL)
+        View->property._destroySuperFunc(View);
+
     // Destroy the shape data
     if (View->shapeData.type == VIW_ID_SHAPE_ADVANCED && View->shapeData.data.data != NULL)
         free(View->shapeData.data.data);
@@ -363,7 +366,7 @@ bool VIW_CreatePropertyBase(VIW_View *View)
     _VIW_InitStructPropertyBase(Property);
 
     // Add memory for controler lists
-    extern VIW_View *(**_VIW_BaseFuncList)(VIW_View * BaseView);
+    extern VIW_View *(*_VIW_BaseFuncList[])(VIW_View * BaseView);
     extern size_t _VIW_BaseFuncCount;
     
     Property->_list.count = _VIW_BaseFuncCount;
@@ -650,7 +653,7 @@ bool _VIW_AddToBaseList(VIW_ViewList *List, VIW_View *View)
     }
 
     // Add in the new view
-    if (!_VIW_AddToViewListWithPos(List, View, End))
+    if (!_VIW_AddToViewListWithPos(List, View, (uint32_t)(End - List->list)))
     {
         _VIW_AddError(_VIW_ID_ERRORID_ADDTOBASELIST_ADD, _VIW_STRING_ERROR_ADDTOLIST);
         return false;

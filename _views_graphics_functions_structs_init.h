@@ -4,6 +4,15 @@
 #include "Views.h"
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
+
+void _VIW_InitStructColour32(VIW_Colour32 *Struct)
+{
+    Struct->r = 0;
+    Struct->g = 0;
+    Struct->b = 0;
+    Struct->a = 0;
+}
 
 void _VIW_InitStructPropertyGraphics(VIW_PropertyGraphics *Struct)
 {
@@ -12,7 +21,7 @@ void _VIW_InitStructPropertyGraphics(VIW_PropertyGraphics *Struct)
     Struct->_canvas = NULL;
     Struct->_w = 0;
     Struct->_h = 0;
-    Struct->colour = 0;
+    _VIW_InitStructColour32(&Struct->colour);
 }
 
 void _VIW_InitStructPropertyGraphicsBase(VIW_PropertyGraphicsBase *Struct)

@@ -206,6 +206,7 @@ struct __VIW_Property
     void (*_destroyFunc)(VIW_View *View);     // The function which destroys the property
     void (*_destroySuperFunc)(VIW_View *View);// The function to destroy the super property
     bool (*_runFunc)(VIW_View *View);         // The function to run when the view needs to do its function
+    bool (*_runSuperFunc)(VIW_View *View);    // The function to run when the view needs to do its function
     enum _VIW_ID_PropertyType _superType;     // The type of run function that it uses (and the type the order is)
     VIW_View *_nextBase;                      // The base up next in the hierarchy
 };
