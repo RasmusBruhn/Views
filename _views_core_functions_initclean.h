@@ -727,32 +727,6 @@ bool VIW_UpdateOrder(VIW_View *View, int32_t Order)
     return true;
 }
 
-// Update all roots
-bool VIW_ForceUpdate(void)
-{
-    extern VIW_ViewList _VIW_RootList;
-
-    for (VIW_View **List = _VIW_RootList.list, **EndList = _VIW_RootList.list + _VIW_RootList.count; List < EndList; ++List)
-        if (!_VIW_ForceUpdate(*List))
-        {
-            _VIW_AddError(_VIW_ID_ERRORID_FORCEUPDATEINT_UPDATE, _VIW_STRING_ERROR_UPDATE);
-            return false;
-        }
-
-    return true;
-}
-
-bool _VIW_ForceUpdate(VIW_View *View)
-{
-    // Abort if view is inactive
-    if (!View->_flags.totalActive)
-        return true;
-
-    // Update all children
-    if (View->_child.list.list != NULL)
-        for (VIW_View **List = View->_child.list.list, **EndList = )
-}
-
 /* VIW_View *VIW_CreateScriptView(VIW_View *Parent, uint64_t Time, uint64_t Increase, uint32_t Order)
 {
     DBG_SessionStart("VIW_CreateScriptView");

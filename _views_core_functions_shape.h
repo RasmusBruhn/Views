@@ -3,7 +3,7 @@
 
 #include "Views.h"
 
-bool _VIW_UpdateShape(VIW_View *View, bool AllowSiblingUpdate)
+bool _VIW_Update(VIW_View *View, bool AllowSiblingUpdate)
 {
     // Stop if it is inactive
     if (!View->_flags.totalActive)
@@ -15,14 +15,14 @@ bool _VIW_UpdateShape(VIW_View *View, bool AllowSiblingUpdate)
         // No shape is defined
         case (VIW_ID_SHAPE_NONE):
             // Give warning
-            _VIW_SetError(_VIW_ID_ERRORID_UPDATESHAPE_TYPENONE, _VIW_STRING_ERROR_TYPENONE);
+            _VIW_SetError(_VIW_ID_ERRORID_UPDATE_TYPENONE, _VIW_STRING_ERROR_TYPENONE);
             break;
 
         // The window shape should be used
         case (VIW_ID_SHAPE_WINDOW):
             if (!_VIW_UpdateShapeWindow(View))
             {
-                _VIW_AddError(_VIW_ID_ERRORID_UPDATESHAPE_WINDOW, _VIW_STRING_ERROR_UPDATESHAPEWINDOW);
+                _VIW_AddError(_VIW_ID_ERRORID_UPDATE_WINDOW, _VIW_STRING_ERROR_UPDATESHAPEWINDOW);
                 return false;
             }
             break;
@@ -31,7 +31,7 @@ bool _VIW_UpdateShape(VIW_View *View, bool AllowSiblingUpdate)
         case (VIW_ID_SHAPE_COPY):
             if (!_VIW_UpdateShapeCopy(View))
             {
-                _VIW_AddError(_VIW_ID_ERRORID_UPDATESHAPE_COPY, _VIW_STRING_ERROR_UPDATESHAPECOPY);
+                _VIW_AddError(_VIW_ID_ERRORID_UPDATE_COPY, _VIW_STRING_ERROR_UPDATESHAPECOPY);
                 return false;
             }
             break;
@@ -39,13 +39,13 @@ bool _VIW_UpdateShape(VIW_View *View, bool AllowSiblingUpdate)
         case (VIW_ID_SHAPE_ADVANCED):
             if (!_VIW_UpdateShapeAdvanced(View))
             {
-                _VIW_AddError(_VIW_ID_ERRORID_UPDATESHAPE_ADVANCED, _VIW_STRING_ERROR_UPDATESHAPEADVANCED);
+                _VIW_AddError(_VIW_ID_ERRORID_UPDATE_ADVANCED, _VIW_STRING_ERROR_UPDATESHAPEADVANCED);
                 return false;
             }
             break;
 
         default:
-            _VIW_SetError(_VIW_ID_ERRORID_UPDATESHAPE_TYPE, _VIW_STRING_ERROR_UNKNOWNTYPE, View->shapeData.type);
+            _VIW_SetError(_VIW_ID_ERRORID_UPDATE_TYPE, _VIW_STRING_ERROR_UNKNOWNTYPE, View->shapeData.type);
             return false;
     }
 
@@ -67,9 +67,9 @@ bool _VIW_UpdateShape(VIW_View *View, bool AllowSiblingUpdate)
     // Update the children
     for (VIW_View **ViewList = View->_child.list.list, **EndList = ViewList + View->_child.list.count; ViewList < EndList; ++ViewList)
         if ((*ViewList)->_flags.totalActive)
-            if (!_VIW_UpdateShape(*ViewList, false))
+            if (!_VIW_Update(*ViewList, false))
             {
-                _VIW_AddError(_VIW_ID_ERRORID_UPDATESHAPE_CHILD, _VIW_STRING_ERROR_UPDATECHILD);
+                _VIW_AddError(_VIW_ID_ERRORID_UPDATE_CHILD, _VIW_STRING_ERROR_UPDATECHILD);
                 return false;
             }
 
@@ -81,9 +81,9 @@ bool _VIW_UpdateShape(VIW_View *View, bool AllowSiblingUpdate)
         {
             for (VIW_View **ViewList = View->_parent.parent->_child.list.list + View->_parent.childPos + 1, **EndList = View->_parent.parent->_child.list.list + View->_parent.parent->_child.list.count; ViewList < EndList; ++ViewList)
                 if ((*ViewList)->_flags.totalActive)
-                    if (!_VIW_UpdateShape(*ViewList, false))
+                    if (!_VIW_Update(*ViewList, false))
                     {
-                        _VIW_AddError(_VIW_ID_ERRORID_UPDATESHAPE_SIBLING, _VIW_STRING_ERROR_UPDATESIBLING);
+                        _VIW_AddError(_VIW_ID_ERRORID_UPDATE_SIBLING, _VIW_STRING_ERROR_UPDATESIBLING);
                         return false;
                     }
         }
@@ -91,9 +91,9 @@ bool _VIW_UpdateShape(VIW_View *View, bool AllowSiblingUpdate)
         // Update the next sibling
         else if (View->_flags.updateNextSibling)
             if (View->_parent.childPos < View->_parent.parent->_child.list.count - 1 && View->_parent.parent->_child.list.list[View->_parent.childPos + 1]->_flags.totalActive)
-                if (!_VIW_UpdateShape(View->_parent.parent->_child.list.list[View->_parent.childPos + 1], true))
+                if (!_VIW_Update(View->_parent.parent->_child.list.list[View->_parent.childPos + 1], true))
                 {
-                    _VIW_AddError(_VIW_ID_ERRORID_UPDATESHAPE_NEXTSIBLING, _VIW_STRING_ERROR_UPDATENEXTSIBLING);
+                    _VIW_AddError(_VIW_ID_ERRORID_UPDATE_NEXTSIBLING, _VIW_STRING_ERROR_UPDATENEXTSIBLING);
                     return false;
                 }
     }
@@ -102,14 +102,14 @@ bool _VIW_UpdateShape(VIW_View *View, bool AllowSiblingUpdate)
     if (View->property._updateFunc != NULL)
         if (!View->property._updateFunc(View))
         {
-            _VIW_AddError(_VIW_ID_ERRORID_UPDATESHAPE_PROPERTY, _VIW_STRING_ERROR_UPDATEPROPERTY);
+            _VIW_AddError(_VIW_ID_ERRORID_UPDATE_PROPERTY, _VIW_STRING_ERROR_UPDATEPROPERTY);
             return false;
         }
 
     if (View->property._updateSuperFunc != NULL)
         if (!View->property._updateSuperFunc(View))
         {
-            _VIW_AddError(_VIW_ID_ERRORID_UPDATESHAPE_SUPERPROPERTY, _VIW_STRING_ERROR_UPDATEPROPERTY);
+            _VIW_AddError(_VIW_ID_ERRORID_UPDATE_SUPERPROPERTY, _VIW_STRING_ERROR_UPDATEPROPERTY);
             return false;
         }
 

@@ -6,7 +6,7 @@
 // Updates the shape of a view
 // Returns true on success, false on error
 // View: The view to be updated
-#define VIW_UpdateShape(View) _VIW_UpdateShape(View, true)
+#define VIW_Update(View) _VIW_Update(View, true)
 
 // Creates a new view and puts it at the end of the child list
 // Returns the view, NULL on error
