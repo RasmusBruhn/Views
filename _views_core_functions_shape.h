@@ -3,6 +3,38 @@
 
 #include "Views.h"
 
+bool VIW_SetBaseOrigin(VIW_View *View, int32_t x, int32_t y)
+{
+    if (View->property._type != _VIW_ID_PROPERTY_BASE)
+    {
+        _VIW_SetError(_VIW_ID_ERRORID_SETBASEORIGIN_BASE, _VIW_STRING_ERROR_BASE);
+        return false;
+    }
+
+    VIW_PropertyBase *Property = (VIW_PropertyBase *)View->property.data;
+    
+    Property->_rect.x = x;
+    Property->_rect.y = y;
+
+    return true;
+}
+
+bool VIW_AddBaseOrigin(VIW_View *View, int32_t x, int32_t y)
+{
+    if (View->property._type != _VIW_ID_PROPERTY_BASE)
+    {
+        _VIW_SetError(_VIW_ID_ERRORID_ADDBASEORIGIN_BASE, _VIW_STRING_ERROR_BASE);
+        return false;
+    }
+
+    VIW_PropertyBase *Property = (VIW_PropertyBase *)View->property.data;
+
+    Property->_rect.x += x;
+    Property->_rect.y += y;
+
+    return true;
+}
+
 bool _VIW_Update(VIW_View *View, bool AllowSiblingUpdate)
 {
     // Stop if it is inactive
@@ -48,21 +80,6 @@ bool _VIW_Update(VIW_View *View, bool AllowSiblingUpdate)
             _VIW_SetError(_VIW_ID_ERRORID_UPDATE_TYPE, _VIW_STRING_ERROR_UNKNOWNTYPE, View->shapeData.type);
             return false;
     }
-
-    // Update the bounding box
-    if (View->_parent.parent == NULL)
-    {
-        OBJ_CopyRect(View->_bounds.rect, View->_shape.rect);
-    }
-
-    else
-    {
-        OBJ_CopyRect(View->_bounds.rect, View->_parent.parent->_shape.boundRect);
-    }
-
-    // Update the bounded shape
-    OBJ_CopyRect(View->_shape.boundRect, View->_shape.rect);
-    OBJ_CommonRect(View->_shape.boundRect, View->_bounds.rect);
 
     // Update the children
     for (VIW_View **ViewList = View->_child.list.list, **EndList = ViewList + View->_child.list.count; ViewList < EndList; ++ViewList)
@@ -119,16 +136,16 @@ bool _VIW_Update(VIW_View *View, bool AllowSiblingUpdate)
 bool _VIW_UpdateShapeCopy(VIW_View *View)
 {
     // Get the view to copy from
-    SDL_Rect *Rect = _VIW_FindRefView(View, &View->shapeData.data.ref);
+    SDL_Rect *RefRect = _VIW_FindRefView(View, &View->shapeData.data.ref);
 
-    if (Rect == NULL)
+    if (RefRect == NULL)
     {
         _VIW_AddError(_VIW_ID_ERRORID_UPDATESHAPECOPY_REF, _VIW_STRING_ERROR_NOREF);
         return false;
     }
 
     // Copy the shape of the reference
-    OBJ_CopyRect(View->_shape.rect, *Rect);
+    OBJ_CopyRect(View->_shape.rect, *RefRect);
 
     return true;
 }
@@ -187,7 +204,7 @@ bool _VIW_UpdateShapeAdvanced(VIW_View *View)
     return true;
 }
 
-bool _VIW_UpdateShapeCoord(VIW_View* View, VIW_RectPart *Coord, int32_t *(*GetPos)(VIW_View* View), int32_t *(*GetSize)(VIW_View* View))
+bool _VIW_UpdateShapeCoord(VIW_View *View, VIW_RectPart *Coord, int32_t *(*GetPos)(SDL_Rect *Rect), int32_t *(*GetSize)(SDL_Rect *Rect))
 {
     switch (Coord->type)
     {
@@ -226,7 +243,7 @@ bool _VIW_UpdateShapeCoord(VIW_View* View, VIW_RectPart *Coord, int32_t *(*GetPo
     return true;
 }
 
-bool _VIW_UpdateShapeCoordStretch(VIW_View *View, VIW_RectStretch *Coord, int32_t *(*GetPos)(VIW_View *View), int32_t *(*GetSize)(VIW_View *View))
+bool _VIW_UpdateShapeCoordStretch(VIW_View *View, VIW_RectStretch *Coord, int32_t *(*GetPos)(SDL_Rect *Rect), int32_t *(*GetSize)(SDL_Rect *Rect))
 {
     // Get positions
     int32_t Pos1 = _VIW_GetPos(View, &Coord->pos1, GetPos, GetSize);
@@ -255,7 +272,7 @@ bool _VIW_UpdateShapeCoordStretch(VIW_View *View, VIW_RectStretch *Coord, int32_
     return true;
 }
 
-bool _VIW_UpdateShapeCoordOrigin(VIW_View *View, VIW_RectOrigin *Coord, int32_t *(*GetPos)(VIW_View *View), int32_t *(*GetSize)(VIW_View *View))
+bool _VIW_UpdateShapeCoordOrigin(VIW_View *View, VIW_RectOrigin *Coord, int32_t *(*GetPos)(SDL_Rect *Rect), int32_t *(*GetSize)(SDL_Rect *Rect))
 {
     // Get position
     int32_t Pos = _VIW_GetPos(View, &Coord->pos, GetPos, GetSize);
@@ -309,7 +326,7 @@ bool _VIW_UpdateShapeCoordOrigin(VIW_View *View, VIW_RectOrigin *Coord, int32_t 
     return true;
 }
 
-int32_t _VIW_GetSize(VIW_View *View, VIW_Size *SizeData, int32_t *(*GetPos)(VIW_View *View), int32_t *(*GetSize)(VIW_View *View))
+int32_t _VIW_GetSize(VIW_View *View, VIW_Size *SizeData, int32_t *(*GetPos)(SDL_Rect *Rect), int32_t *(*GetSize)(SDL_Rect *Rect))
 {
     int32_t Size;
 
@@ -374,22 +391,22 @@ int32_t _VIW_GetSize(VIW_View *View, VIW_Size *SizeData, int32_t *(*GetPos)(VIW_
     return Size;
 }
 
-int32_t _VIW_GetSizeCopy(VIW_View *View, VIW_Reference *CopyRef, int32_t *(*GetSize)(VIW_View *View))
+int32_t _VIW_GetSizeCopy(VIW_View *View, VIW_Reference *CopyRef, int32_t *(*GetSize)(SDL_Rect *Rect))
 {
     // Get the reference view
-    VIW_View *RefView = _VIW_FindRefView(View, CopyRef);
+    SDL_Rect *RefRect = _VIW_FindRefView(View, CopyRef);
 
-    if (RefView == NULL)
+    if (RefRect == NULL)
     {
         _VIW_AddError(_VIW_ID_ERRORID_GETSIZECOPY_REF, _VIW_STRING_ERROR_NOREF);
         return VIW_ID_RETURNERROR_INT32_T;
     }
 
     // Get the size
-    return *GetSize(RefView);
+    return *GetSize(RefRect);
 }
 
-int32_t _VIW_GetSizeDiff(VIW_View *View, VIW_SizeDiff *SizeData, int32_t *(*GetPos)(VIW_View *View), int32_t *(*GetSize)(VIW_View *View))
+int32_t _VIW_GetSizeDiff(VIW_View *View, VIW_SizeDiff *SizeData, int32_t *(*GetPos)(SDL_Rect *Rect), int32_t *(*GetSize)(SDL_Rect *Rect))
 {
     // Find the 2 positions
     int32_t Pos1 = _VIW_GetPos(View, &SizeData->pos1, GetPos, GetSize);
@@ -405,7 +422,7 @@ int32_t _VIW_GetSizeDiff(VIW_View *View, VIW_SizeDiff *SizeData, int32_t *(*GetP
     return Pos2 - Pos1;
 }
 
-int32_t _VIW_GetPos(VIW_View *View, VIW_Pos *PosData, int32_t *(*GetPos)(VIW_View *View), int32_t *(*GetSize)(VIW_View *View))
+int32_t _VIW_GetPos(VIW_View *View, VIW_Pos *PosData, int32_t *(*GetPos)(SDL_Rect *Rect), int32_t *(*GetSize)(SDL_Rect *Rect))
 {
     int32_t Pos;
 
@@ -486,7 +503,7 @@ int32_t _VIW_GetPos(VIW_View *View, VIW_Pos *PosData, int32_t *(*GetPos)(VIW_Vie
     return Pos;
 }
 
-int32_t _VIW_GetBiasAnchorPoint(VIW_View *View, VIW_BiasAnchor *Anchor, int32_t *(*GetPos)(VIW_View *View), int32_t *(*GetSize)(VIW_View *View))
+int32_t _VIW_GetBiasAnchorPoint(VIW_View *View, VIW_BiasAnchor *Anchor, int32_t *(*GetPos)(SDL_Rect *Rect), int32_t *(*GetSize)(SDL_Rect *Rect))
 {
     // Get the 2 anchor points
     int32_t AnchorPoint1 = _VIW_GetAnchorPoint(View, &Anchor->anchor1, GetPos, GetSize);
@@ -502,20 +519,20 @@ int32_t _VIW_GetBiasAnchorPoint(VIW_View *View, VIW_BiasAnchor *Anchor, int32_t 
     return AnchorPoint1 + (int32_t)((double)(AnchorPoint2 - AnchorPoint1) * Anchor->bias);
 }
 
-int32_t _VIW_GetAnchorPoint(VIW_View *View, VIW_Anchor *Anchor, int32_t *(*GetPos)(VIW_View *View), int32_t *(*GetSize)(VIW_View *View))
+int32_t _VIW_GetAnchorPoint(VIW_View *View, VIW_Anchor *Anchor, int32_t *(*GetPos)(SDL_Rect *Rect), int32_t *(*GetSize)(SDL_Rect *Rect))
 {
     // Get the reference view
-    VIW_View *AnchorView = _VIW_FindRefView(View, &Anchor->ref);
+    SDL_Rect *AnchorRect = _VIW_FindRefView(View, &Anchor->ref);
 
-    if (AnchorView == NULL)
+    if (AnchorRect == NULL)
     {
         _VIW_AddError(_VIW_ID_ERRORID_GETANCHORPOINT_REF, _VIW_STRING_ERROR_NOREF);
         return VIW_ID_RETURNERROR_INT32_T;
     }
 
     // Get position and size
-    int32_t Pos = *GetPos(AnchorView);
-    int32_t Size = *GetSize(AnchorView);
+    int32_t Pos = *GetPos(AnchorRect);
+    int32_t Size = *GetSize(AnchorRect);
 
     // Calculate the anchor point
     int32_t AnchorPoint;

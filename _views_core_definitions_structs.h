@@ -166,8 +166,7 @@ struct __VIW_Bounds
 // shape data, contains information on the shape
 struct __VIW_Shape
 {
-    SDL_Rect rect;      // The rect defining the view, this is in absolute coordinates
-    SDL_Rect boundRect; // The part of rect within the bounds
+    SDL_Rect rect;      // The rect defining the view, coordinates is relative to next base
 };
 
 // Window data, information on the window in which the view is located

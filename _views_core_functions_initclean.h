@@ -295,6 +295,13 @@ bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, V
             break;
 
         case (VIW_ID_RELATION_BASE):
+            // Make sure the parent is a base
+            if (View->property._nextBase != View->_parent.parent)
+            {
+                _VIW_SetError(_VIW_ID_ERRORID_ADDREF_BASE, _VIW_STRING_ERROR_BASEPARENT);
+                return false;
+            }
+
             break;
 
         case (VIW_ID_RELATION_SIBLING):
@@ -428,7 +435,9 @@ bool VIW_CreatePropertyBase(VIW_View *View)
 bool _VIW_UpdatePropertyBase(VIW_View *View)
 {
     VIW_PropertyBase *Property = (VIW_PropertyBase *)View->property.data;
-    OBJ_SetRect(Property->_rect, 0, 0, View->_shape.rect.w, View->_shape.rect.h);
+
+    Property->_rect.w = View->_shape.rect.w;
+    Property->_rect.h = View->_shape.rect.h;
 }
 
 // Free list of controlers

@@ -80,6 +80,20 @@ bool VIW_UpdateOrder(VIW_View *View, int32_t Order);
 
 // Set shape
 
+// Sets the origin of a base
+// Returns true on success and false on error
+// View: The base view to update
+// x: The x-position of the origin
+// y: The y-position of the origin
+bool VIW_SetBaseOrigin(VIW_View *View, int32_t x, int32_t y);
+
+// Adds to the origin of a base
+// Returns true on success and false on error
+// View: The base view to update
+// x: The value to add to the x-position of the origin
+// y: The value to add to the y-position of the origin
+bool VIW_AddBaseOrigin(VIW_View *View, int32_t x, int32_t y);
+
 // Updates the shape of a view
 // Returns true on success, false on error
 // View: The view to be updated
@@ -107,7 +121,7 @@ bool _VIW_UpdateShapeAdvanced(VIW_View *View);
 // Coord: The RectPart structure of the coordinate to update
 // GetPos: A function to retrieve a pointer to the position of (x or y) of the shape of a view
 // GetSize: A function to retrieve a pointer to the position of (w or h) of the shape of a view
-bool _VIW_UpdateShapeCoord(VIW_View *View, VIW_RectPart *Coord, int32_t *(*GetPos)(VIW_View *View), int32_t *(*GetSize)(VIW_View *View));
+bool _VIW_UpdateShapeCoord(VIW_View *View, VIW_RectPart *Coord, int32_t *(*GetPos)(SDL_Rect *Rect), int32_t *(*GetSize)(SDL_Rect *Rect));
 
 // Updates one coordinate of the shape of a view by the method of Stretch (shape is stretched between 2 points)
 // Returns true on success, false on error
@@ -115,7 +129,7 @@ bool _VIW_UpdateShapeCoord(VIW_View *View, VIW_RectPart *Coord, int32_t *(*GetPo
 // Coord: The RectStretch structure of the coordinate to update
 // GetPos: A function to retrieve a pointer to the position of (x or y) of the shape of a view
 // GetSize: A function to retrieve a pointer to the position of (w or h) of the shape of a view
-bool _VIW_UpdateShapeCoordStretch(VIW_View *View, VIW_RectStretch *Coord, int32_t *(*GetPos)(VIW_View *View), int32_t *(*GetSize)(VIW_View *View));
+bool _VIW_UpdateShapeCoordStretch(VIW_View *View, VIW_RectStretch *Coord, int32_t *(*GetPos)(SDL_Rect *Rect), int32_t *(*GetSize)(SDL_Rect *Rect));
 
 // Updates one coordinate of the shape of a view by the method of Origin (the origin of the shape is set by 1 point and the size of the shape is set by 1 size)
 // Returns true on success, false on error
@@ -123,7 +137,7 @@ bool _VIW_UpdateShapeCoordStretch(VIW_View *View, VIW_RectStretch *Coord, int32_
 // Coord: The RectOrigin structure of the coordinate to update
 // GetPos: A function to retrieve a pointer to the position of (x or y) of the shape of a view
 // GetSize: A function to retrieve a pointer to the position of (w or h) of the shape of a view
-bool _VIW_UpdateShapeCoordOrigin(VIW_View *View, VIW_RectOrigin *Coord, int32_t *(*GetPos)(VIW_View *View), int32_t *(*GetSize)(VIW_View *View));
+bool _VIW_UpdateShapeCoordOrigin(VIW_View *View, VIW_RectOrigin *Coord, int32_t *(*GetPos)(SDL_Rect *Rect), int32_t *(*GetSize)(SDL_Rect *Rect));
 
 // Gets a size by using a specific method
 // Returns the size and VIW_ID_RETURNERROR_INT32_T on error
@@ -131,14 +145,14 @@ bool _VIW_UpdateShapeCoordOrigin(VIW_View *View, VIW_RectOrigin *Coord, int32_t 
 // SizeData: The Size structure containing data to calculate the size
 // GetPos: A function to retrieve a pointer to the position of (x or y) of the shape of a view
 // GetSize: A function to retrieve a pointer to the position of (w or h) of the shape of a view
-int32_t _VIW_GetSize(VIW_View *View, VIW_Size *SizeData, int32_t *(*GetPos)(VIW_View *View), int32_t *(*GetSize)(VIW_View *View));
+int32_t _VIW_GetSize(VIW_View *View, VIW_Size *SizeData, int32_t *(*GetPos)(SDL_Rect *Rect), int32_t *(*GetSize)(SDL_Rect *Rect));
 
 // Copies the size from another view
 // Returns the size, VIW_ID_RETURNERROR_INT32_T on error
 // View: The view for which to calculate the size
 // CopyRef: The reference structure to get the size from
 // GetSize: The function to retrieve the size
-int32_t _VIW_GetSizeCopy(VIW_View *View, VIW_Reference *CopyRef, int32_t *(*GetSize)(VIW_View *View));
+int32_t _VIW_GetSizeCopy(VIW_View *View, VIW_Reference *CopyRef, int32_t *(*GetSize)(SDL_Rect *Rect));
 
 // Gets a size by finding the difference between 2 positions
 // Returns the size and VIW_ID_RETURNERROR_INT32_T on error
@@ -146,7 +160,7 @@ int32_t _VIW_GetSizeCopy(VIW_View *View, VIW_Reference *CopyRef, int32_t *(*GetS
 // SizeData: The SizeDiff structure containing data to calculate the size
 // GetPos: A function to retrieve a pointer to the position of (x or y) of the shape of a view
 // GetSize: A function to retrieve a pointer to the position of (w or h) of the shape of a view
-int32_t _VIW_GetSizeDiff(VIW_View *View, VIW_SizeDiff *SizeData, int32_t *(*GetPos)(VIW_View *View), int32_t *(*GetSize)(VIW_View *View));
+int32_t _VIW_GetSizeDiff(VIW_View *View, VIW_SizeDiff *SizeData, int32_t *(*GetPos)(SDL_Rect *Rect), int32_t *(*GetSize)(SDL_Rect *Rect));
 
 // Gets a position by use of a specified method
 // Returns the position and VIW_ID_RETURNERROR_INT32_T on error
@@ -154,7 +168,7 @@ int32_t _VIW_GetSizeDiff(VIW_View *View, VIW_SizeDiff *SizeData, int32_t *(*GetP
 // PosData: The Pos structure containing data to calculate the position
 // GetPos: A function to retrieve a pointer to the position of (x or y) of the shape of a view
 // GetSize: A function to retrieve a pointer to the position of (w or h) of the shape of a view
-int32_t _VIW_GetPos(VIW_View *View, VIW_Pos *PosData, int32_t *(*GetPos)(VIW_View *View), int32_t *(*GetSize)(VIW_View *View));
+int32_t _VIW_GetPos(VIW_View *View, VIW_Pos *PosData, int32_t *(*GetPos)(SDL_Rect *Rect), int32_t *(*GetSize)(SDL_Rect *Rect));
 
 // Gets the position anchored to with the given biased anchor
 // Returns the anchor point and VIW_ID_RETURNERROR_INT32_T on error
@@ -162,7 +176,7 @@ int32_t _VIW_GetPos(VIW_View *View, VIW_Pos *PosData, int32_t *(*GetPos)(VIW_Vie
 // Anchor: The data to get the biased anchor point
 // GetPos: A function to retrieve a pointer to the position of (x or y) of the shape of a view
 // GetSize: A function to retrieve a pointer to the position of (w or h) of the shape of a view
-int32_t _VIW_GetBiasAnchorPoint(VIW_View *View, VIW_BiasAnchor *Anchor, int32_t *(*GetPos)(VIW_View *View), int32_t *(*GetSize)(VIW_View *View));
+int32_t _VIW_GetBiasAnchorPoint(VIW_View *View, VIW_BiasAnchor *Anchor, int32_t *(*GetPos)(SDL_Rect *Rect), int32_t *(*GetSize)(SDL_Rect *Rect));
 
 // Gets the position anchored to with the given anchor
 // Returns the anchor point and VIW_ID_RETURNERROR_INT32_T on error
@@ -170,7 +184,7 @@ int32_t _VIW_GetBiasAnchorPoint(VIW_View *View, VIW_BiasAnchor *Anchor, int32_t 
 // Anchor: The data to get the anchor point
 // GetPos: A function to retrieve a pointer to the position of (x or y) of the shape of a view
 // GetSize: A function to retrieve a pointer to the position of (w or h) of the shape of a view
-int32_t _VIW_GetAnchorPoint(VIW_View *View, VIW_Anchor *Anchor, int32_t *(*GetPos)(VIW_View *View), int32_t *(*GetSize)(VIW_View *View));
+int32_t _VIW_GetAnchorPoint(VIW_View *View, VIW_Anchor *Anchor, int32_t *(*GetPos)(SDL_Rect *Rect), int32_t *(*GetSize)(SDL_Rect *Rect));
 
 // Finds the view which there is a reference to
 // Returns a pointer to the view, NULL on error

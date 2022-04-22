@@ -74,7 +74,6 @@ void _VIW_InitStructWindow(VIW_Window *Struct)
 
 void _VIW_InitStructShape(VIW_Shape *Struct)
 {
-    OBJ_SetRect(Struct->boundRect, 0, 0, 0, 0);
     OBJ_SetRect(Struct->rect, 0, 0, 0, 0);
 }
 
