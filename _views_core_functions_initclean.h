@@ -352,6 +352,13 @@ bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, V
 // Create controler views and add them to the list
 bool VIW_CreatePropertyBase(VIW_View *View)
 {
+    // Make sure the views does not have a property already
+    if (View->property._type != _VIW_ID_PROPERTY_NONE)
+    {
+        _VIW_SetError(_VIW_ID_ERRORID_CREATEPROPERTYBASE_EXISTS, _VIW_STRING_ERROR_ALREADYPROPERTY);
+        return false;
+    }
+
     // Give warning if there are any children
     if (View->_child.list.count > 0)
         _VIW_SetError(_VIW_ID_ERRORID_CREATEPROPERTYBASE_CHILDREN, _VIW_STRING_ERROR_PROPERTYCHILDREN);

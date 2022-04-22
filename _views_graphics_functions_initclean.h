@@ -204,24 +204,145 @@ bool _VIW_UpdatePropertyGraphics(VIW_View *View)
     return true;
 }
 
+// Make sure there is not already a property and give warning if there are children
+// Allocate memory and initialise
+// Set correct base
+// Add graphics property
+// Activate canvas
+// Set property values
 bool VIW_CreatePropertyGraphicsBase(VIW_View *View)
 {
+    // Make sure the views does not have a property already
+    if (View->property._type != _VIW_ID_PROPERTY_NONE)
+    {
+        _VIW_SetError(_VIW_ID_ERRORID_CREATEPROPERTYGRAPHICSBASE_EXISTS, _VIW_STRING_ERROR_ALREADYPROPERTY);
+        return false;
+    }
 
+    // Give warning if there are any children
+    if (View->_child.list.count > 0)
+        _VIW_SetError(_VIW_ID_ERRORID_CREATEPROPERTYGRAPHICSBASE_CHILDREN, _VIW_STRING_ERROR_PROPERTYCHILDREN);
+
+    // Get memory for it
+    VIW_PropertyGraphicsBase *Property = (VIW_PropertyGraphicsBase *)malloc(sizeof(VIW_PropertyGraphicsBase));
+
+    if (Property == NULL)
+    {
+        _VIW_AddErrorForeign(_VIW_ID_ERRORID_CREATEPROPERTYGRAPHICSBASE_MEMORY, strerror(errno), _VIW_STRING_ERROR_MALLOC);
+        return false;
+    }
+
+    // Initialise
+    _VIW_InitStructPropertyGraphicsBase(Property);
+
+    // Set correct next base
+    VIW_View *OldBase = View->property._nextBase;
+    View->property._nextBase = View->property._nextBase->property._nextBase;
+
+    // Add graphics property
+    if (!_VIW_CreatePropertyGraphics(View))
+    {
+        _VIW_AddError(_VIW_ID_ERRORID_CREATEPROPERTYGRAPHICSBASE_SUPER, _VIW_STRING_ERROR_CREATESUPER);
+        free(Property);
+        View->property._nextBase = OldBase;
+        return false;
+    }
+
+    // Activate canvas
+    if (!VIW_ActivateCanvas(View))
+    {
+        _VIW_AddError(_VIW_ID_ERRORID_REATEPROPERTYGRAPHISBASE_CANVAS, _VIW_STRING_ERROR_CREATECANVAS);
+        free(Property);
+        View->property._destroySuperFunc(View);
+        View->property._nextBase = OldBase;
+        return false;
+    }
+
+    // Set values
+    View->property.data = Property;
+    View->property._destroyFunc = &_VIW_DestroyPropertyGraphicsBase;
+    View->property._runFunc = &_VIW_RunPropertyGraphicsBase;
+    View->property._type = _VIW_ID_PROPERTY_GRAPHICSBASE;
+    View->property._updateFunc = NULL;
+
+    return true;
 }
 
+// Create a view
+// Add the property
 VIW_View *VIW_CreateGraphicsBaseView(VIW_View *Parent)
 {
+    // Create a view
+    VIW_View *View = VIW_CreateView(Parent);
 
+    if (View == NULL)
+    {
+        _VIW_AddError(_VIW_ID_ERRORID_CREATEGRAPHICSBASEVIEW_VIEW, _VIW_STRING_ERROR_CREATEVIEW);
+        return NULL;
+    }
+
+    // Add property
+    if (!VIW_CreatePropertyGraphicsBase(View))
+    {
+        _VIW_AddError(_VIW_ID_ERRORID_CREATEGRAPHICSBASEVIEW_PROPERTY, _VIW_STRING_ERROR_ADDPROPERTY);
+        VIW_DestroyView(View);
+        return NULL;
+    }
+
+    return View;
 }
 
+// Free the list
+// Free the property data
+// Reinitialise values
 void _VIW_DestroyPropertyGraphicsBase(VIW_View *View)
 {
+    // Make sure the list is freed
+    VIW_PropertyGraphicsBase *Property = (VIW_PropertyGraphicsBase *)View->property.data;
 
+    if (Property->_list.list != NULL)
+        free(Property->_list.list);
+
+    // Free data
+    free(View->property.data);
+
+    // Reset values
+    View->property.data = NULL;
+    View->property._destroyFunc = NULL;
+    View->property._runFunc = NULL;
+    View->property._type = _VIW_ID_PROPERTY_NONE;
+    View->property._updateFunc = NULL;
 }
 
+// Go through all elements to draw
+// If active then set viewport and draw
 bool _VIW_RunPropertyGraphicsBase(VIW_View *View)
 {
-    
+    // Run through all of the graphics views in the list
+    VIW_PropertyGraphicsBase *Property = (VIW_PropertyGraphicsBase *)View->property.data;
+
+    for (VIW_View **List = Property->_list.list, **EndList = Property->_list.list + Property->_list.count; List < EndList; ++List)
+    {
+        // Make sure it is active
+        if (!(*List)->_flags.totalActive)
+            continue;
+
+        // Set viewport
+        if (SDL_RenderSetViewport(View->_window.renderer, &(*List)->_shape.rect) != 0)
+        {
+            _VIW_AddErrorForeign(_VIW_ID_ERRORID_RUNPROPERTYGRAPHICSBASE_VIEWPORT, SDL_GetError(), _VIW_STRING_ERROR_SETVIEWPORT);
+            return false;
+        }
+
+        // Render view
+        if (!(*List)->property._runSuperFunc(*List))
+        {
+            _VIW_AddError(_VIW_ID_ERRORID_RUNPROPERTYGRAPHICSBASE_RENDER, _VIW_STRING_ERROR_RENDER);
+            return false;
+        }
+    }
+
+    return true;
 }
 
 // Set canvas to active
