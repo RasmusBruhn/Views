@@ -10,6 +10,7 @@
 typedef struct __VIW_PropertyGraphics VIW_PropertyGraphics;
 typedef struct __VIW_PropertyGraphicsBase VIW_PropertyGraphicsBase;
 typedef struct __VIW_Colour32 VIW_Colour32;
+typedef struct __VIW_PropertyGraphicsFill VIW_PropertyGraphicsFill;
 
 struct __VIW_Colour32
 {
@@ -32,6 +33,11 @@ struct __VIW_PropertyGraphics
 struct __VIW_PropertyGraphicsBase
 {
     VIW_ViewList _list;          // The different elements to draw on the canvas
+};
+
+struct __VIW_PropertyGraphicsFill
+{
+    VIW_Colour32 colour;        // The colour to fill with
 };
 
 #endif // VIEWS_GRAPHICS_DEFINITIONS_STRUCTS

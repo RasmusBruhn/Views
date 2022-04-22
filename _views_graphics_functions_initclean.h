@@ -193,6 +193,19 @@ bool _VIW_UpdatePropertyGraphics(VIW_View *View)
             return false;
         }
 
+        // Draw the background
+        if (SDL_SetRenderDrawColor(View->_window.renderer, Property->colour.r, Property->colour.g, Property->colour.b, Property->colour.a) != 0)
+        {
+            _VIW_AddErrorForeign(_VIW_ID_ERRORID_UPDATEPROPERTYGRAPHICS_RENDERCOLOUR, SDL_GetError(), _VIW_STRING_ERROR_RENDERCOLOUR);
+            return false;
+        }
+
+        if (SDL_RenderFillRect(View->_window.renderer, NULL) != 0)
+        {
+            _VIW_AddErrorForeign(_VIW_ID_ERRORID_UPDATEPROPERTYGRAPHICS_RENDERFILL, SDL_GetError(), _VIW_STRING_ERROR_RENDERFILL);
+            return false;
+        }
+
         // Draw onto the canvas
         if (!View->property._runFunc(View))
         {
@@ -401,6 +414,29 @@ bool VIW_DeactivateCanvas(VIW_View *View)
     }
 
     return true;
+}
+
+// Allocate memory
+// Add the graphics property
+bool VIW_CreatePropertyGraphicsFill(VIW_View *View)
+{
+    // Allocate memory
+    
+}
+
+VIW_View *VIW_CreateGraphicsFillView(VIW_View *Parent)
+{
+
+}
+
+void _VIW_DestroyPropertyGraphicsFill(VIW_View *View)
+{
+
+}
+
+bool _VIW_RunPropertyGraphicsFill(VIW_View *View)
+{
+
 }
 
 #endif // VIEWS_GRAPHICS_FUNCTIONS_INITCLEAN

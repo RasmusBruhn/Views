@@ -66,6 +66,27 @@ bool VIW_ActivateCanvas(VIW_View *View);
 // View: The view to deactivate the canvas for
 bool VIW_DeactivateCanvas(VIW_View *View);
 
+// Special functions
+
+// Adds a property to a view which fills it with one colour
+// Returns true on success and false on error
+// View: The view to add the property to
+bool VIW_CreatePropertyGraphicsFill(VIW_View *View);
+
+// Creates a view with the graphics fill property
+// Returns a pointer to the view or NULL on error
+// Parent: The parent of the view
+VIW_View *VIW_CreateGraphicsFillView(VIW_View *Parent);
+
+// Destroys a graphics fill property
+// View: The view with the property to be destroyed
+void _VIW_DestroyPropertyGraphicsFill(VIW_View *View);
+
+// Performs the fill action of a graphics fill view
+// Returns true on success and false on error
+// View: The view to fill
+bool _VIW_RunPropertyGraphicsFill(VIW_View *View);
+
 // Struct initialisers
 
 // Initializes the structure
