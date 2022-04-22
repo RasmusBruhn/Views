@@ -3,38 +3,6 @@
 
 #include "Views.h"
 
-bool VIW_SetBaseOrigin(VIW_View *View, int32_t x, int32_t y)
-{
-    if (View->property._type != _VIW_ID_PROPERTY_BASE)
-    {
-        _VIW_SetError(_VIW_ID_ERRORID_SETBASEORIGIN_BASE, _VIW_STRING_ERROR_BASE);
-        return false;
-    }
-
-    VIW_PropertyBase *Property = (VIW_PropertyBase *)View->property.data;
-    
-    Property->_rect.x = x;
-    Property->_rect.y = y;
-
-    return true;
-}
-
-bool VIW_AddBaseOrigin(VIW_View *View, int32_t x, int32_t y)
-{
-    if (View->property._type != _VIW_ID_PROPERTY_BASE)
-    {
-        _VIW_SetError(_VIW_ID_ERRORID_ADDBASEORIGIN_BASE, _VIW_STRING_ERROR_BASE);
-        return false;
-    }
-
-    VIW_PropertyBase *Property = (VIW_PropertyBase *)View->property.data;
-
-    Property->_rect.x += x;
-    Property->_rect.y += y;
-
-    return true;
-}
-
 bool _VIW_Update(VIW_View *View, bool AllowSiblingUpdate)
 {
     // Stop if it is inactive

@@ -37,11 +37,6 @@ void _VIW_DestroyPropertyGraphicsBase(VIW_View *View);
 // View: The view to draw the graphics for
 bool _VIW_RunPropertyGraphicsBase(VIW_View *View);
 
-// Update the graphics base property
-// Returns true on success and false on error
-// View: The base view to update
-bool _VIW_UpdatePropertyGraphicsBase(VIW_View *View);
-
 // Create a graphics base property
 // Returns true on success and false on error
 // View: The view to add the graphics for
@@ -66,16 +61,10 @@ bool _VIW_UpdatePropertyGraphics(VIW_View *View);
 // View: The view to activate the canvas for
 bool VIW_ActivateCanvas(VIW_View *View);
 
-// Deactivates the canvas for a graphics view
+// Deactivates the canvas for a graphics view, a base view cannot deactivate the canvas
 // Returns true on success and false on error
 // View: The view to deactivate the canvas for
 bool VIW_DeactivateCanvas(VIW_View *View);
-
-// Add graphics to a base list
-
-// Remove graphics from a base list
-
-// Update the prosition on a base list
 
 // Struct initialisers
 

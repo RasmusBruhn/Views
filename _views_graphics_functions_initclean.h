@@ -9,17 +9,12 @@
 #include <stdlib.h>
 
 
-// Check if it needs a new canvas
 // Create new canvas
 // Destroy old canvas if needed
 bool _VIW_CreateCanvas(VIW_View *View)
 {
     // Get the data
     VIW_PropertyGraphics *SuperData = (VIW_PropertyGraphics *)View->property.superData;
-
-    // Abort if it does not need to be added
-    if (SuperData->_canvas != NULL && SuperData->_w == View->_shape.rect.w && SuperData->_h == View->_shape.rect.h)
-        return true;
 
     // Create the new canvas
     SDL_Texture *Canvas = SDL_CreateTexture(View->_window.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, View->_shape.rect.w, View->_shape.rect.h);
@@ -37,6 +32,10 @@ bool _VIW_CreateCanvas(VIW_View *View)
     // Set canvas
     SuperData->_canvas = Canvas;
 
+    // Set size
+    SuperData->_w = View->_shape.rect.w;
+    SuperData->_h = View->_shape.rect.h;
+
     return true;
 }
 
@@ -47,7 +46,7 @@ void _VIW_DestroyCanvas(VIW_View *View)
     // Check that it has a canvas
     VIW_PropertyGraphics *SuperData = (VIW_PropertyGraphics *)View->property.superData;
 
-    if (SuperData->_canvas != NULL)
+    if (SuperData->_canvas == NULL)
     {
         _VIW_SetError(_VIW_ID_ERRORID_DESTROYCANVAS_INIT, _VIW_STRING_ERROR_NOTINIT);
         return;
@@ -55,6 +54,10 @@ void _VIW_DestroyCanvas(VIW_View *View)
 
     // Destroy it
     SDL_DestroyTexture(SuperData->_canvas);
+
+    // Set size
+    SuperData->_w = 0;
+    SuperData->_h = 0;
 }
 
 // Allocate memory
@@ -134,16 +137,7 @@ bool _VIW_RunPropertyGraphics(VIW_View *View)
 
     if (Property->_canvas != NULL)
     {
-        // Get rect to copy from
-        SDL_Rect Src;
-        
-        Src.x = View->_shape.boundRect.x - View->_shape.rect.x;
-        Src.y = View->_shape.boundRect.y - View->_shape.rect.y;
-        Src.w = View->_shape.boundRect.w;
-        Src.h = View->_shape.boundRect.h;
-
-        // Copy canvas
-        if (SDL_RenderCopy(View->_window.renderer, Property->_canvas, &Src, &View->_shape.boundRect) != 0)
+        if (SDL_RenderCopy(View->_window.renderer, Property->_canvas, NULL, &View->_shape.rect) != 0)
         {
             _VIW_AddErrorForeign(_VIW_ID_ERRORID_RUNPROPERTYGRAPHICS_COPY, SDL_GetError(), _VIW_STRING_ERROR_COPYTEXTURE);
             return false;
@@ -164,15 +158,128 @@ bool _VIW_RunPropertyGraphics(VIW_View *View)
         if (!View->property._runFunc(View))
         {
             _VIW_AddError(_VIW_ID_ERRORID_RUNPROPERTYGRAPHICS_RUN, _VIW_STRING_ERROR_RENDER);
+            return false;
         }
     }
 
     return true;
 }
 
+// Update the canvas size if needed
+// Redraw the canvas
 bool _VIW_UpdatePropertyGraphics(VIW_View *View)
 {
+    VIW_PropertyGraphics *Property = (VIW_PropertyGraphics *)View->property.superData;
 
+    // Check if canvas needs to be destroyed
+    if (Property->_canvas != NULL && !View->_flags.totalActive && !Property->saveWhileInactive)
+        _VIW_DestroyCanvas(View);
+
+    // Check if canvas needs to be created
+    if ((View->_flags.totalActive || Property->saveWhileInactive) && (Property->_w != View->_shape.rect.w || Property->_h != View->_shape.rect.h))
+        if (!_VIW_CreateCanvas(View))
+        {
+            _VIW_AddError(_VIW_ID_ERRORID_UPDATEPROPERTYGRAPHICS_CREATECANVAS, _VIW_STRING_ERROR_CREATECANVAS);
+            return false;
+        }
+
+    // Redraw if active
+    if (View->_flags.totalActive && Property->_canvas != NULL)
+    {
+        // Set render target
+        if (SDL_SetRenderTarget(View->_window.renderer, Property->_canvas) != 0)
+        {
+            _VIW_AddErrorForeign(_VIW_ID_ERRORID_UPDATEPROPERTYGRAPHICS_RENDERTARGET, SDL_GetError(), _VIW_STRING_ERROR_RENDERTARGET);
+            return false;
+        }
+
+        // Draw onto the canvas
+        if (!View->property._runFunc(View))
+        {
+            _VIW_AddError(_VIW_ID_ERRORID_UPDATEPROPERTYGRAPHICS_DRAW, _VIW_STRING_ERROR_RENDER);
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool VIW_CreatePropertyGraphicsBase(VIW_View *View)
+{
+
+}
+
+VIW_View *VIW_CreateGraphicsBaseView(VIW_View *Parent)
+{
+
+}
+
+void _VIW_DestroyPropertyGraphicsBase(VIW_View *View)
+{
+
+}
+
+bool _VIW_RunPropertyGraphicsBase(VIW_View *View)
+{
+    
+}
+
+// Set canvas to active
+// Update the canvas
+bool VIW_ActivateCanvas(VIW_View *View)
+{
+    // Set it to active
+    VIW_PropertyGraphics *Property = (VIW_PropertyGraphics *)View->property.superData;
+
+    Property->_useCanvas = true;
+
+    // Update
+    if (View->property._updateSuperFunc == NULL)
+    {
+        _VIW_SetError(_VIW_ID_ERRORID_ACTIVATECANVAS_UPDATEFUNC, _VIW_STRING_ERROR_NULLFUNCTION);
+        return false;
+    }
+
+    if (!View->property._updateSuperFunc(View))
+    {
+        _VIW_AddError(_VIW_ID_ERRORID_ACTIVATECANVAS_UPDATE, _VIW_STRING_ERROR_UPDATE);
+        return false;
+    }
+
+    return true;
+}
+
+// Make sure view is not a base
+// Deactivate canvas
+// Update canvas
+bool VIW_DeactivateCanvas(VIW_View *View)
+{
+    // Check if it is a base
+    if (View->property._type == _VIW_ID_PROPERTY_GRAPHICSBASE)
+    {
+        _VIW_SetError(_VIW_ID_ERRORID_DEACTIVATECANVAS_BASE, _VIW_STRING_ERROR_BASECANVAS);
+        return false;
+    }
+
+    // Deactivate it
+    VIW_PropertyGraphics *Property = (VIW_PropertyGraphics *)View->property.superData;
+
+    Property->_useCanvas = false;
+
+    // Update the canvas
+    if (View->property._updateSuperFunc == NULL)
+    {
+        _VIW_SetError(_VIW_ID_ERRORID_DEACTIVATECANVAS_UPDATEFUNC, _VIW_STRING_ERROR_NULLFUNCTION);
+        return false;
+    }
+
+    if (!View->property._updateSuperFunc(View))
+    {
+        _VIW_AddError(_VIW_ID_ERRORID_DEACTIVATECANVAS_UPDATE, _VIW_STRING_ERROR_UPDATE);
+        return false;
+    }
+
+    return true;
 }
 
 #endif // VIEWS_GRAPHICS_FUNCTIONS_INITCLEAN

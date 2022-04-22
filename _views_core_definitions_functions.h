@@ -80,20 +80,6 @@ bool VIW_UpdateOrder(VIW_View *View, int32_t Order);
 
 // Set shape
 
-// Sets the origin of a base
-// Returns true on success and false on error
-// View: The base view to update
-// x: The x-position of the origin
-// y: The y-position of the origin
-bool VIW_SetBaseOrigin(VIW_View *View, int32_t x, int32_t y);
-
-// Adds to the origin of a base
-// Returns true on success and false on error
-// View: The base view to update
-// x: The value to add to the x-position of the origin
-// y: The value to add to the y-position of the origin
-bool VIW_AddBaseOrigin(VIW_View *View, int32_t x, int32_t y);
-
 // Updates the shape of a view
 // Returns true on success, false on error
 // View: The view to be updated
