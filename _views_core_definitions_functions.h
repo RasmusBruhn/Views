@@ -176,29 +176,34 @@ int32_t _VIW_GetAnchorPoint(VIW_View *View, VIW_Anchor *Anchor, int32_t *(*GetPo
 // Returns a pointer to the view, NULL on error
 // View: The view for which the reference is calculated
 // Ref: The data for the reference
-VIW_View *_VIW_FindRefView(VIW_View *View, VIW_Reference *Ref);
+SDL_Rect *_VIW_FindRefView(VIW_View *View, VIW_Reference *Ref);
 
 // Retrieves a pointer to the x of the shape of a view
 // Returns a pointer to the coordinate
-// View: The view for which to retrieve the coordinate
-int32_t *_VIW_GetX(VIW_View *View);
+// Rect: The Rect for which to retrieve the coordinate
+int32_t *_VIW_GetX(SDL_Rect *Rect);
 
 // Retrieves a pointer to the y of the shape of a view
 // Returns a pointer to the coordinate
-// View: The view for which to retrieve the coordinate
-int32_t *_VIW_GetY(VIW_View *View);
+// Rect: The Rect for which to retrieve the coordinate
+int32_t *_VIW_GetY(SDL_Rect *Rect);
 
 // Retrieves a pointer to the w of the shape of a view
 // Returns a pointer to the size
-// View: The view for which to retrieve the size
-int32_t *_VIW_GetW(VIW_View *View);
+// Rect: The Rect for which to retrieve the coordinate
+int32_t *_VIW_GetW(SDL_Rect *Rect);
 
 // Retrieves a pointer to the h of the shape of a view
 // Returns a pointer to the size
-// View: The view for which to retrieve the size
-int32_t *_VIW_GetH(VIW_View *View);
+// Rect: The Rect for which to retrieve the coordinate
+int32_t *_VIW_GetH(SDL_Rect *Rect);
 
 // Initialization and cleanup
+
+// Updates the base property
+// Returns true on success and false on error
+// View: The view with the base property to update
+bool _VIW_UpdatePropertyBase(VIW_View *View);
 
 // Destroys the base property for a view
 // Returns true on success and false on error

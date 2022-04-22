@@ -85,7 +85,7 @@ void _VIW_InitStructBounds(VIW_Bounds *Struct)
 
 void _VIW_InitStructShapeData(VIW_ShapeData *Struct)
 {
-    Struct->type = VIW_ID_SHAPE_NONE;
+    Struct->type = VIW_ID_SHAPE_WINDOW;
 }
 
 void _VIW_InitStructRect(VIW_Rect *Struct)
@@ -180,6 +180,7 @@ void _VIW_InitStructScriptList(VIW_ScriptList *Struct)
 void _VIW_InitStructPropertyBase(VIW_PropertyBase *Struct)
 {
     _VIW_InitStructViewList(&Struct->_list);
+    OBJ_SetRect(Struct->_rect, 0, 0, 0, 0);
 }
 
 #endif // VIEWS_CORE_FUNCTIONS_STRUCTS_INIT_H_INCLUDED

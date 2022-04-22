@@ -119,42 +119,44 @@ bool _VIW_Update(VIW_View *View, bool AllowSiblingUpdate)
 bool _VIW_UpdateShapeCopy(VIW_View *View)
 {
     // Get the view to copy from
-    VIW_View *Ref = _VIW_FindRefView(View, &View->shapeData.data.ref);
+    SDL_Rect *Rect = _VIW_FindRefView(View, &View->shapeData.data.ref);
 
-    if (Ref == NULL)
+    if (Rect == NULL)
     {
         _VIW_AddError(_VIW_ID_ERRORID_UPDATESHAPECOPY_REF, _VIW_STRING_ERROR_NOREF);
         return false;
     }
 
-    // Make sure they have the same base
-    if (Ref->property._nextBase != View->property._nextBase && Ref != View->property._nextBase)
-    {
-        _VIW_SetError(_VIW_ID_ERRORID_UPDATESHAPECOPY_BASE, _VIW_STRING_ERROR_SAMEBASE);
-        return false;
-    }
-
     // Copy the shape of the reference
-    if (View->property._nextBase == Ref)
-    {
-        OBJ_SetRect(View->_shape.rect, 0, 0, Ref->_shape.rect.w, Ref->_shape.rect.h);
-    }
-
-    else
-    {
-        OBJ_CopyRect(View->_shape.rect, Ref->_shape.rect);
-    }
+    OBJ_CopyRect(View->_shape.rect, *Rect);
 
     return true;
 }
 
 bool _VIW_UpdateShapeWindow(VIW_View *View)
 {
-    // Set the position to (0,0)
-    OBJ_SetPoint(View->_shape.rect, 0, 0);
+    // Copy from the window if it is a base
+    if (View->_parent.root == View)
+    {
+        // Set the position to (0,0)
+        OBJ_SetPoint(View->_shape.rect, 0, 0);
 
-    // Get window shape
-    SDL_GetWindowSize(View->_window.window, &View->_shape.rect.w, &View->_shape.rect.h);
+        // Get window shape
+        SDL_GetWindowSize(View->_window.window, &View->_shape.rect.w, &View->_shape.rect.h);
+    }
+
+    // Copy from parent which is not a base
+    else if (View->_parent.parent != View->property._nextBase)
+    {
+        OBJ_CopyRect(View->_shape.rect, View->_parent.parent->_shape.rect);
+    }
+
+    // Copy from base
+    else
+    {
+        VIW_PropertyBase *Property = (VIW_PropertyBase *)View->property._nextBase->property.data;
+        OBJ_CopyRect(View->_shape.rect, Property->_rect);
+    }
 
     return true;
 }
@@ -549,9 +551,9 @@ int32_t _VIW_GetAnchorPoint(VIW_View *View, VIW_Anchor *Anchor, int32_t *(*GetPo
     return AnchorPoint + Anchor->offset;
 }
 
-VIW_View *_VIW_FindRefView(VIW_View *View, VIW_Reference *Ref)
+SDL_Rect *_VIW_FindRefView(VIW_View *View, VIW_Reference *Ref)
 {
-    VIW_View *RefView;
+    SDL_Rect *RefRect;
 
     // Find the view
     switch (Ref->view)
@@ -561,14 +563,9 @@ VIW_View *_VIW_FindRefView(VIW_View *View, VIW_Reference *Ref)
             _VIW_SetError(_VIW_ID_ERRORID_FINDREFVIEW_NONE, _VIW_STRING_ERROR_TYPENONE);
             return NULL;
 
-        // It is anchored to it's root
-        case (VIW_ID_RELATION_ROOT):
-            RefView = View->_parent.root;
-            break;
-
-        // It is anchored to it's parent
-        case (VIW_ID_RELATION_PARENT):
-            RefView = View->_parent.parent;
+        // It is anchored to it's base
+        case (VIW_ID_RELATION_BASE):
+            RefRect = &((VIW_PropertyBase *)View->property._nextBase->property.data)->_rect;
             break;
 
         // It is anchored to the sibling above it in the children list
@@ -580,12 +577,25 @@ VIW_View *_VIW_FindRefView(VIW_View *View, VIW_Reference *Ref)
                 return NULL;
             }
 
-            RefView = View->_parent.parent->_child.list.list[View->_parent.childPos - 1];
+            RefRect = &View->_parent.parent->_child.list.list[View->_parent.childPos - 1]->_shape.rect;
             break;
 
         // It is anchored to something by ID
         case (VIW_ID_RELATION_ID):
-            RefView = Ref->ref;
+            // Make sure it is an earlier sibling
+            if (Ref->ref->_parent.parent != View->_parent.parent)
+            {
+                _VIW_SetError(_VIW_ID_ERRORID_FINDREFVIEW_SAMEPARENT, _VIW_STRING_ERROR_SAMEPARENT);
+                return NULL;
+            }
+
+            if (Ref->ref->_parent.childPos >= View->_parent.childPos)
+            {
+                _VIW_SetError(_VIW_ID_ERRORID_FINDREFVIEW_CHILDPOS, _VIW_STRING_ERROR_EARLYCHILD);
+                return NULL;
+            }
+
+            RefRect = &Ref->ref->_shape.rect;
             break;
 
         // The view type is unknown
@@ -594,27 +604,27 @@ VIW_View *_VIW_FindRefView(VIW_View *View, VIW_Reference *Ref)
             return NULL;
     }
 
-    return RefView;
+    return RefRect;
 }
 
-int32_t *_VIW_GetX(VIW_View *View)
+int32_t *_VIW_GetX(SDL_Rect *Rect)
 {
-    return &View->_shape.rect.x;
+    return &Rect->x;
 }
 
-int32_t *_VIW_GetY(VIW_View *View)
+int32_t *_VIW_GetY(SDL_Rect *Rect)
 {
-    return &View->_shape.rect.y;
+    return &Rect->y;
 }
 
-int32_t *_VIW_GetW(VIW_View *View)
+int32_t *_VIW_GetW(SDL_Rect *Rect)
 {
-    return &View->_shape.rect.w;
+    return &Rect->w;
 }
 
-int32_t *_VIW_GetH(VIW_View *View)
+int32_t *_VIW_GetH(SDL_Rect *Rect)
 {
-    return &View->_shape.rect.h;
+    return &Rect->h;
 }
 
 #endif // VIEWS_CORE_FUNCTIONS_SHAPE_H_INCLUDED

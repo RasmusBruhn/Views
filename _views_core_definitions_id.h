@@ -14,8 +14,7 @@ enum VIW_ID_Anchor
 enum VIW_ID_Relation
 {
     VIW_ID_RELATION_NONE,
-    VIW_ID_RELATION_ROOT,    // Its root
-    VIW_ID_RELATION_PARENT,  // Its parent
+    VIW_ID_RELATION_BASE,    // Its base
     VIW_ID_RELATION_SIBLING, // The previous sibling
     VIW_ID_RELATION_ID       // By ID (This can be any of its earlier siblings, ancestors or ancestor siblings)
 };

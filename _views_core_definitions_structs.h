@@ -243,6 +243,7 @@ struct __VIW_View
 struct __VIW_PropertyBase
 {
     VIW_ViewList _list; // The list of controlers for things like events and graphics
+    SDL_Rect _rect;    // A rectangle with the same shape as the view and position 0,0
 };
 
 #endif // VIEWS_CORE_DEFINITIONS_STRUCTS_H_INCLUDED

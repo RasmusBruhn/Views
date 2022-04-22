@@ -214,8 +214,7 @@ VIW_View *VIW_CreateSubView(VIW_View *Parent)
     }
 
     // Add the shape data
-    View->shapeData.type = VIW_ID_SHAPE_COPY;
-    View->shapeData.data.ref.view = VIW_ID_RELATION_PARENT;
+    View->shapeData.type = VIW_ID_SHAPE_WINDOW;
 
     return View;
 }
@@ -256,6 +255,12 @@ bool VIW_UseAdvancedShapeData(VIW_View *View)
         return true;
     }
 
+    // Check that its parent is its base
+    if (View->property._nextBase != View->_parent.parent)
+    {
+        _VIW_SetError(_VIW_ID_ERRORID_USEADVANCEDSHAPEDATA_BASE, _VIW_STRING_ERROR_BASEPARENT);
+    }
+
     // If it is not initialized, get memory
     View->shapeData.data.data = (VIW_Rect *)malloc(sizeof(VIW_Rect));
 
@@ -289,10 +294,7 @@ bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, V
         case (VIW_ID_RELATION_NONE):
             break;
 
-        case (VIW_ID_RELATION_PARENT):
-            break;
-
-        case (VIW_ID_RELATION_ROOT):
+        case (VIW_ID_RELATION_BASE):
             break;
 
         case (VIW_ID_RELATION_SIBLING):
@@ -308,25 +310,19 @@ bool VIW_AddRef(VIW_View *View, VIW_Reference *Ref, enum VIW_ID_Relation type, V
             break;
 
         case (VIW_ID_RELATION_ID):
-            // Find the relation
-            do
+            // Make sure they are siblings
+            if (View->_parent.parent != ID->_parent.parent)
             {
-                if (Relation == Relation->_parent.root)
-                {
-                    _VIW_SetError(_VIW_ID_ERRORID_ADDREF_REFNOTFOUND, _VIW_STRING_ERROR_ILLIGALREF);
-                    return false;
-                }
-
-                for (SiblingRelation = Relation->_parent.parent->_child.list.list + Relation->_parent.childPos; SiblingRelation > Relation->_parent.parent->_child.list.list; --SiblingRelation)
-                    if (*(SiblingRelation - 1) == ID)
-                    {
-                        ID->_flags.updateAllSiblings = true;
-                        break;
-                    }
-
-                if (SiblingRelation > Relation->_parent.parent->_child.list.list)
-                    break;
-            } while ((Relation = Relation->_parent.parent) != ID);
+                _VIW_SetError(_VIW_ID_ERRORID_ADDREF_PARENT, _VIW_STRING_ERROR_SAMEPARENT);
+                return false;
+            }
+            
+            // Make sure it is an earlier sibling
+            if (View->_parent.childPos <= ID->_parent.childPos)
+            {
+                _VIW_SetError(_VIW_ID_ERRORID_ADDREF_EARLYCHILD, _VIW_STRING_ERROR_EARLYCHILD);
+                return false;
+            }
 
             Ref->ref = ID;
             break;
@@ -386,7 +382,7 @@ bool VIW_CreatePropertyBase(VIW_View *View)
     View->property.data = Property;
     View->property._type = _VIW_ID_PROPERTY_BASE;
     View->property._destroyFunc = &_VIW_DestroyPropertyBase;
-    View->property._updateFunc = NULL;
+    View->property._updateFunc = &_VIW_UpdatePropertyBase;
     View->property._runFunc = NULL;
 
     // Add to the list
@@ -427,6 +423,13 @@ bool VIW_CreatePropertyBase(VIW_View *View)
             _VIW_UpdateNextBase(*ViewList, Base);
     }
 }*/
+
+// Set the rect
+bool _VIW_UpdatePropertyBase(VIW_View *View)
+{
+    VIW_PropertyBase *Property = (VIW_PropertyBase *)View->property.data;
+    OBJ_SetRect(Property->_rect, 0, 0, View->_shape.rect.w, View->_shape.rect.h);
+}
 
 // Free list of controlers
 // Free memory
